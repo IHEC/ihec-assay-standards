@@ -3,190 +3,261 @@ use strict;
 use Getopt::Long;
 
 my $gap = 5000000;
-my $outdir = "";
-my $help = 0;
-my $nouniq;
-
-GetOptions("gap=i" => \$gap,
-	   "outdir=s" => \$outdir,
-	   "nouniq" => \$nouniq,
-	   "help" => \$help);
-
 my $file = shift(@ARGV);
+my $help = 0;
 
-if($help || $file eq "")
-	{
-		print "Usage: uniqsample.pl [options] infile\ninfile: Sorted bed file of reads\nOptions:\n --gap n\tCalculate unique read target counts at multiples of n [default 5000000]\n --outdir dir\tSet output directory
- --nouniq\tDo not print non-duplicates files\n --help\t\tPrint this help page\n"; 
-		exit 1;
-	}
+GetOptions("gap=i" => \$gap, "help" => \$help);
 
 chomp $file;
-my $target = 1e12;   #Set initial target to more than total number of reads
-my $selleft = $target;
-my $totleft = $target;
-my $filtcount = $target;
+my $uniqfile = $file;
+$uniqfile =~ s/\.bam/.rmdup.bam/;
 
-open(IN, "$file") or die "$!";
-
-#ORIG file has duplicates removed
-#OUT file does not have duplicates removed
-
-my $origdupfile = $file;
-if($outdir)
-	{ $origdupfile =~ s/.*\//$outdir\//; }
-$origdupfile =~ s/\.?[0-9]*\.bed/.dupsremoved.$target.bed/;
-
-my $dupremfile = $origdupfile;
-$dupremfile =~ s/$target.bed/bed/;
-
-if($nouniq)
+if($help || $file eq "")
 {
-	open(ORIG, '>/dev/null') or die "$!";
-}
-else
-{
-	open(ORIG, ">$dupremfile") or die "$!";
+	print "Usage: uniqsample.pl [options] infile\ninfile: Sorted file of reads\nOptions:\n --gap n\tCalculate unique read target counts at multiples of n [default 5000000]\n"; 
+	exit 1;
 }
 
-#if($outdir)
-#	{ $file =~ s/.*\//$outdir\//; }
-#$file =~ s/\.?[0-9]*\.bed$/.$target.bed/;
-open(OUT, '>/dev/null') or die "$!";
 
-while($target > 0.5 * $gap)    #Count duplicates and print duplicate removed files
+#Samtools must be in system path
+open(IN, "samtools view -h $file | ") or die "$!";   
+open(UNIQ, " | samtools view -bSo $uniqfile -") or die "$!";
+
+my ($chr, $start, $cigar, $strand, $oldline); 
+
+my $header;
+my $length = 0;
+my %counts;
+my %startstrandcounts;
+my $lc = 0;
+my $uniq = 0;
+my $target;
+my ($l, $ct, $op);
+my @s;
+my @numop;
+my @cigararray;
+
+while(<IN>)
 {
-	print "Calculating for ".(($target ==  1e12) ? "all":$target)." duplicates-removed reads.\n";	
+	$l = $_;
 
-	my ($chr, $end, $start, $strand, $oldline); 
-
-	my %counts;
-	my $dupcount = 0;
-	my $wc = 0;
-	my $uniq = 0;
-
-	while(<IN>)   #Count numbers of duplicates and print out file with duplicates removed
+	#Store header
+	if($l =~ /^@/)
 	{
-		my $l = $_;
-
-		if(int(rand()*$totleft) < $selleft) #select read with probability (filtcount - nselected)/(total[wc] - ntested)    =~ fraction of reads to be kept
-		{	
-			if($target != 1e12)
-			{	print OUT "$l";	}
-
-			chomp $l;
-			my @s = split "\t", $l;	
-
-			$wc++;
-		
-			if($s[2] == $end && $s[1] == $start && $s[5] eq $strand && $s[0] eq $chr)
-			{
-				$dupcount++;
-			}
-
-			else
-			{
-				if($dupcount) 
-				{
-					$counts{$dupcount}++;    # $counts{n} measures the number of reads with exactly n duplicates (>=1)
-					if(!$nouniq) {print ORIG "$oldline\n";}
-				}
-				$dupcount = 1;
-			}	
-
-			($chr, $end, $start, $strand) = ($s[0], $s[2], $s[1], $s[5]);
-
-			$oldline = $l;
-			$selleft--;
-		}
-		$totleft--;
+		$header .= $l;
+		print UNIQ "$l";
 	}
 
-	$counts{$dupcount}++;
-	if(!$nouniq) {print ORIG "$oldline\n";}
-	close(IN);
-	close(ORIG);
-	close(OUT);
 
-
-	#Create R command for calculating total number of reads 
-	# $uniq = current number of unique reads
-	# $target = desired number of unique reads
-	# Solve $target - $uniq + sum(n * $counts{n}) = 0 
-
-
-	my $Rcomm = "uniroot(function(x){";
-
-	foreach my $ct (sort {$a <=> $b} keys %counts)
-	{
-		$uniq += $counts{$ct};
-		$Rcomm .= "$counts{$ct}*x^$ct+";
-	}
-
-	print "$uniq duplicates removed reads.\n"; #Print out number of unique reads from previous iteration
-	
-	if($target == 1e12) #Rename target file with true number of unique reads 
-	{
-		#my $origrename = $origdupfile;
-		#$origrename =~ s/dupsremoved\.$target/$uniq/;
-		#`mv $origdupfile $origrename`;
-		$target = $gap * int($uniq/$gap);
-	}
-	else			#Set input file to filtered set using previous target number file including duplicated reads
-	{
-		my $uniqfile = $file;
-		$uniqfile =~ s/$target/$uniq/;	
-		my $origdupfilenew = $origdupfile;
-		$origdupfilenew =~ s/$target/$uniq/;
-		`mv $file $uniqfile`;
-		if(!$nouniq)
-			{`mv $origdupfile $origdupfilenew`;}
-		$file = $uniqfile;
-
-		if($target < 1.5 * $gap)
-		{
-			last; #Final filtering for approximately $gap unique reads
-		}
-		else
-		{
-			$target -= $gap;
-		}
-	}		
-
-	
-	$Rcomm .= "$target-$uniq}, c(0,1))\$root";
-
-	my $Rresult = `Rscript -e '$Rcomm'`; #Run R command and parse result
-
-	chomp $Rresult;
-	$Rresult =~ s/^\[1\] //;
-
-	$filtcount = int(0.9 + $wc * (1 - $Rresult)); # Convert fraction into number of reads to be selected
-
-	#Use previous OUT file as new input file and set temporary filenames for new OUT and ORIG files
-
-	open(IN, "$file") or die "$!";
-
-	if($outdir)
-		{ $file =~ s/.*\//$outdir\//; }
-	$file =~ s/\.?[0-9]*\.bed$/.$target.bed/;
-	open(OUT, ">$file") or die "$!";
-	
-
-	$origdupfile = $file;
-	$origdupfile =~ s/\.?[0-9]*\.bed/.dupsremoved.$target.bed/;
-	#open(ORIG, ">$origdupfile") or die "$!";
-	if($nouniq)
-	{
-		open(ORIG, '>/dev/null') or die "$!";
-	}
 	else
 	{
-		open(ORIG, ">$origdupfile") or die "$!";
-	}
+		@s = split "\t", $l;
 
-	$selleft = $filtcount;
-	$totleft = $wc;
+		$strand = $s[1] & 16;
+
+		@cigararray = split(/(?<=[A-Z])/, $s[5]);
+
+		$length = 0;
+
+		if(!($s[1] & 1024))
+		{
+			print UNIQ "$l";
+		}	
+
+		if($cigararray[0] =~ /S$/)
+		{
+			my @nummasked = split(/(?<=[A-Z])/, $cigararray[0]);
+			$s[3] -= $nummasked[0];
+		}
+		
+
+		foreach $op (@cigararray)
+		{
+			if ($op =~ /[MDNXP]$/)
+			{
+				my @numop = split(/(?<=[A-Z])/, $op);
+				$length += $numop[0];
+			}
+				
+		}
+		
+		#if($s[3] == $start && $s[2] eq $chr)
+		if($s[2] eq $chr)
+		{
+			$startstrandcounts{"$s[3]\t$length\t$strand"}++;
+		}
+
+		else
+		{
+			foreach $ct (values %startstrandcounts)
+			{
+				$counts{$ct}++;
+			}
+			
+			%startstrandcounts = ();
+			$chr = $s[2];
+			#$start = $s[3];
+		}
+	}
 }
 
+foreach $ct (values %startstrandcounts)
+	{
+		$counts{$ct}++;
+	}
+	
+%startstrandcounts = ();
+
+
+
+close(IN);
+close(UNIQ);
+
+my $Rcomm = "uniroot(function(x){";
+
+foreach my $dupct (sort {$a <=> $b} keys %counts)
+{
+	if($dupct)
+	{
+		$uniq += $counts{$dupct};
+		$lc += $dupct * $counts{$dupct};
+		$Rcomm .= "$counts{$dupct}*x^$dupct+";
+	}
+}
+
+$Rcomm .= "-$uniq";
+my @filehandles;
+my @targets;
+my @probs;
+
+print "$target\t$gap\t$uniq\t".$gap * int($uniq/$gap)."\n";
+for ($target = $gap * int($uniq/$gap); $target >= $gap; $target -= $gap)
+{
+	push @targets, $target;
+
+	my $targetRcomm = "$Rcomm+$target}, c(0,1))\$root";
+
+	print "$targetRcomm\n";
+
+	my $Rresult = `Rscript -e '$targetRcomm'`;
+
+	chomp $Rresult;
+
+	$Rresult =~ s/^\[1\] //; 
+
+	my $filtcount = int(0.9 + $lc * (1 - $Rresult)); # Convert fraction into number of reads to be selected
+
+	push @probs, $Rresult;
+
+	print "$target\t$Rresult\t$filtcount\n";
+
+	my $targetfile = $file;
+	$targetfile =~ s/\.bam$/.$target.rmdup.bam/;
+
+	local *FILE;
+	open(FILE, " | samtools view -bSo $targetfile -") or die "$!";
+	#open (FILE, ">$targetfile") or die "$!";
+
+	push(@filehandles, *FILE);
+}
+
+
+
+print "H\n";
+open(IN2, "samtools view -h $file | ") or die "$!";
+my $nsubs = @targets;
+my @uniqcounts = (0) x $nsubs;
+my $i;
+my %startstranduniqline;
+my $lenstrand;
+my $rand;
+
+$chr = "";
+$start = 0;
+$cigar = ""; 
+$strand = "";
+$oldline = "";
+
+for($i = 0; $i < $nsubs; $i++)
+{
+	my $fh = $filehandles[$i];
+	print $fh "$header";
+}
+
+while(<IN2>)
+{
+	#print "ere";
+	$l = $_;
+
+	if($l !~ /^@/)
+	{
+		@s = split "\t", $l;
+
+		$strand = $s[1] & 16;
+
+		@cigararray = split(/(?<=[A-Z])/, $s[5]);
+
+		$length = 0;
+
+		if($cigararray[0] =~ /S$/)
+		{
+			my @nummasked = split(/(?<=[A-Z])/, $cigararray[0]);
+			$s[3] -= $nummasked[0];
+		}
+		
+
+		foreach $op (@cigararray)
+		{
+			if ($op =~ /[MDNXP]$/)
+			{
+				my @numop = split(/(?<=[A-Z])/, $op);
+				$length += $numop[0];
+			}
+		}
+		
+		if($s[2] eq $chr)
+		{
+			$startstrandcounts{"$s[3]\t$length\t$strand"}++;
+
+			if(!($s[1] & 1024))
+			{
+				$startstranduniqline{"$s[3]\t$length\t$strand"} = $l;
+			}
+		}
+
+
+
+		else
+		{
+			if($chr)
+			{
+			foreach $lenstrand (sort {$a <=> $b} keys %startstrandcounts)
+			{
+				$rand = rand();
+				$i = 0;
+				while($i < $nsubs && $rand > $probs[$i] ** $startstrandcounts{$lenstrand})
+				{
+					my $fh = $filehandles[$i];
+					print $fh "$startstranduniqline{$lenstrand}";
+					$uniqcounts[$i]++;
+					$i++;
+				}
+				
+			}
+			}
+			%startstrandcounts = ();
+			%startstranduniqline = ();
+			$chr = $s[2];
+		}
+	}
+}
+
+
+for($i = 0; $i < $nsubs; $i++)
+{
+	my $fh = $filehandles[$i];
+	close $fh;
+}
+
+	
 
