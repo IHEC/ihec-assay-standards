@@ -64,7 +64,7 @@ while(<IN>)
 			print UNIQ "$l";
 		}	
 
-		if($cigararray[0] =~ /S$/)
+		if($cigararray[0] =~ /S$/)   #Remove soft clip length for read length
 		{
 			my @nummasked = split(/(?<=[A-Z])/, $cigararray[0]);
 			$s[3] -= $nummasked[0];
@@ -73,7 +73,7 @@ while(<IN>)
 
 		foreach $op (@cigararray)
 		{
-			if ($op =~ /[MDNXP]$/)
+			if ($op =~ /[MDNXP]$/)  #Calculate read length from CIGAR string
 			{
 				my @numop = split(/(?<=[A-Z])/, $op);
 				$length += $numop[0];
@@ -81,6 +81,7 @@ while(<IN>)
 				
 		}
 		
+		#Count how many reads map to identical chromosome, start, length (end) and strand
 		#if($s[3] == $start && $s[2] eq $chr)
 		if($s[2] eq $chr)
 		{
@@ -101,6 +102,7 @@ while(<IN>)
 	}
 }
 
+#Increment number of reads with $ct duplicates
 foreach $ct (values %startstrandcounts)
 	{
 		$counts{$ct}++;
@@ -112,6 +114,11 @@ foreach $ct (values %startstrandcounts)
 
 close(IN);
 close(UNIQ);
+
+#Create R command for calculating total number of reads 
+# $uniq = current number of unique reads
+# $target = desired number of unique reads
+# Solve $target - $uniq + sum(n * $counts{n}) = 0 
 
 my $Rcomm = "uniroot(function(x){";
 
@@ -131,6 +138,8 @@ my @targets;
 my @probs;
 
 print "$target\t$gap\t$uniq\t".$gap * int($uniq/$gap)."\n";
+
+#For each target read count, run and parse R command and open filehandles for bams
 for ($target = $gap * int($uniq/$gap); $target >= $gap; $target -= $gap)
 {
 	push @targets, $target;
@@ -164,6 +173,7 @@ for ($target = $gap * int($uniq/$gap); $target >= $gap; $target -= $gap)
 
 
 print "H\n";
+#Reopen input file
 open(IN2, "samtools view -h $file | ") or die "$!";
 my $nsubs = @targets;
 my @uniqcounts = (0) x $nsubs;
@@ -178,6 +188,7 @@ $cigar = "";
 $strand = "";
 $oldline = "";
 
+#Print headers to each output file
 for($i = 0; $i < $nsubs; $i++)
 {
 	my $fh = $filehandles[$i];
@@ -215,7 +226,11 @@ while(<IN2>)
 			}
 		}
 		
-		if($s[2] eq $chr)
+		if($s[2] eq $chr)	#Create R command for calculating total number of reads 
+	# $uniq = current number of unique reads
+	# $target = desired number of unique reads
+	# Solve $target - $uniq + sum(n * $counts{n}) = 0 
+
 		{
 			$startstrandcounts{"$s[3]\t$length\t$strand"}++;
 
@@ -233,6 +248,10 @@ while(<IN2>)
 			{
 			foreach $lenstrand (sort {$a <=> $b} keys %startstrandcounts)
 			{
+				#Choose a random number between 0 and 1, used for all target read counts
+				#For each target read count, calculate probability of seeing no copies of read
+				#         ~ (1 - p)^n
+				#If random number is greater than this, print one copy to output file
 				$rand = rand();
 				$i = 0;
 				while($i < $nsubs && $rand > $probs[$i] ** $startstrandcounts{$lenstrand})
@@ -252,7 +271,7 @@ while(<IN2>)
 	}
 }
 
-
+#Close files
 for($i = 0; $i < $nsubs; $i++)
 {
 	my $fh = $filehandles[$i];
