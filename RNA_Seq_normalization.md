@@ -1,6 +1,6 @@
 # Current CEMT RNA-Seq RPKM computation
 
-In: Genome wide coverage track (aligned to GRCh37lite)
+In: Genome wide coverage track (aligned to transcriptome and repositioned to GRCh37lite)
 
 Out: Normalized RNA-Seq track
 
@@ -8,19 +8,19 @@ Out: Normalized RNA-Seq track
 
 Compute:
 
-- Coverage over each exon (collapsed, no double counting of reads), excluding
+- Read coverage over each exon (exons collapsed, no double counting of reads) normalized by readlength, excluding
   * Mitochondrial genome and genes coding ribosomal proteins
   * 0.5% of exons with highest coverage
 
 Note RPKM[transcript] = [# of mapped reads]/([length of transcript]/10^3)/([total reads]/10^6)
 
-N = [Total reads] = Total coverage over exonic regions not excluded
+N = [total reads] = Total normalized coverage over exonic regions not excluded by above criterion
 
-RPKM[exon] = Coverage[exon]/(length[exon]/10^3)/(N/10^6)
+RPKM[exon] = normalized_coverage[exon]/(length[exon]/10^3)/(N/10^6)
 
-"RPKM[genomic_position]" = Coverage[genomic_position]/(1/10^3)/(N/10^6)
+"RPKM[genomic_position]" = normalized_coverage[genomic_position]/(1/10^3)/(N/10^6)
 
-Define normalized RNA-Seq track as Coverage_Track/(10^3/N)
+Define normalized RNA-Seq track as normalized_coverage_track/(10^9/N)
 
 (Coverage tracks reporting one uniform RPKM value for the gene may also reported)
 
