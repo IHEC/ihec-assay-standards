@@ -139,16 +139,23 @@ my @probs;
 
 print "$target\t$gap\t$uniq\t".$gap * int($uniq/$gap)."\n";
 
-#For each target read count, run and parse R command and open filehandles for bams
+#For each target read count, write to a file, run and parse R command, and open filehandles for bams
 for ($target = $gap * int($uniq/$gap); $target >= $gap; $target -= $gap)
 {
 	push @targets, $target;
 
 	my $targetRcomm = "$Rcomm+$target}, c(0,1))\$root";
+	
+	open(TEMP, ">$file.$target.R") or die "$!";
 
 	print "$targetRcomm\n";
+	
+	sleep 10;
+	
+	print TEMP "$targetRcomm\n";
 
-	my $Rresult = `Rscript -e '$targetRcomm'`;
+	#my $Rresult = `Rscript -e '$targetRcomm'`;
+	my $Rresult = `Rscript $file.$target.R`;
 
 	chomp $Rresult;
 
@@ -168,11 +175,13 @@ for ($target = $gap * int($uniq/$gap); $target >= $gap; $target -= $gap)
 	#open (FILE, ">$targetfile") or die "$!";
 
 	push(@filehandles, *FILE);
+	
+	unlink "$file.$target.R";
 }
 
 
 
-print "H\n";
+#print "H\n";
 #Reopen input file
 open(IN2, "samtools view -h $file | ") or die "$!";
 my $nsubs = @targets;
