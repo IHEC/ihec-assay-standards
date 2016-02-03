@@ -153,6 +153,8 @@ for ($target = $gap * int($uniq/$gap); $target >= $gap; $target -= $gap)
 	sleep 10;
 	
 	print TEMP "$targetRcomm\n";
+	
+	close TEMP;
 
 	#my $Rresult = `Rscript -e '$targetRcomm'`;
 	my $Rresult = `Rscript $file.$target.R`;
