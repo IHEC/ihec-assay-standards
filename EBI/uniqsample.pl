@@ -120,7 +120,8 @@ close(UNIQ);
 # $target = desired number of unique reads
 # Solve $target - $uniq + sum(n * $counts{n}) = 0 
 
-my $Rcomm = "uniroot(function(x){";
+my $Rcomm = "options(expressions=10000);
+uniroot(function(x){";
 
 foreach my $dupct (sort {$a <=> $b} keys %counts)
 {
