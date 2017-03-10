@@ -2,7 +2,7 @@
 
 This folder contains a .PDF file with the definitions and a bash script to calculate the ChIP-seq QC metrics.
 
-Note: v0.3 has been tested only on single-end BP ChIP-seq datasets. 
+Note: v0.3 has only been tested on single-end ChIP-seq datasets. 
 
 Here's an example of how to run the script:
 
