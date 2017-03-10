@@ -6,19 +6,20 @@ Note: v0.3 has only been tested on single-end ChIP-seq datasets.
 
 Here's an example of how to run the script:
 
-bash calculate_ChIP-seq_QC_metrics.bash
 
-     -c $ChIP_original_BAM_file     
+     bash calculate_ChIP-seq_QC_metrics.bash \
 
-     -t H3K4me3 
+          -c $ChIP_original_BAM_file \
+
+          -t H3K4me3 \
      
-     -n $ChIP_sampleName 
+          -n $ChIP_sampleName \
      
-     -i $Input_sampleName 
+          -i $Input_sampleName \
      
-     -p $bed_file  
+          -p $bed_file \
      
-     > ${ChIP_sampleName}_qc_metrics.tsv
+          > ${ChIP_sampleName}_qc_metrics.tsv
 
 To calculate the metrics please use:
 
