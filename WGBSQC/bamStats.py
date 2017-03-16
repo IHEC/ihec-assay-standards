@@ -1,34 +1,326 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><title>Source of bamStats.py - openCEMT - BitBucket</title><script>
-window.WRM=window.WRM||{};window.WRM._unparsedData=window.WRM._unparsedData||{};
-WRM._unparsedData["com.atlassian.bitbucket.server.config-wrm-data:display.max.source.lines.data"]="{\u0022value\u0022:\u002220000\u0022,\u0022key\u0022:\u0022display.max.source.lines\u0022,\u0022type\u0022:\u0022NUMBER\u0022}";
-WRM._unparsedData["com.atlassian.plugins.atlassian-plugins-webresource-plugin:context-path.context-path"]="\u0022\u005C/bitbucket\u0022";
-WRM._unparsedData["com.atlassian.bitbucket.server.feature-wrm-data:attachments.data"]="true";
-WRM._unparsedData["com.atlassian.plugins.atlassian-plugins-webresource-rest:web-resource-manager.resource-base-url-pattern"]="\u0022(?:/bitbucket(?:/s/.*?/_)?/download)\u0022";
-WRM._unparsedData["com.atlassian.bitbucket.server.config-wrm-data:attachment.upload.max.size.data"]="{\u0022value\u0022:\u002210485760\u0022,\u0022key\u0022:\u0022attachment.upload.max.size\u0022,\u0022type\u0022:\u0022NUMBER\u0022}";
-WRM._unparsedData["com.atlassian.bitbucket.server.feature-wrm-data:source.codemirror.data"]="true";
-WRM._unparsedData["com.atlassian.bitbucket.server.bitbucket-web:determine-language.syntax-highlighters"]="{\u0022text/x-ruby\u0022:{\u0022x\u0022:[\u0022ruby\u0022]},\u0022text/x-python\u0022:{\u0022x\u0022:[\u0022python\u0022]},\u0022text/javascript\u0022:{\u0022x\u0022:[\u0022node\u0022]},\u0022text/x-sh\u0022:{\u0022e\u0022:[\u0022makefile\u0022,\u0022Makefile\u0022],\u0022x\u0022:[\u0022sh\u0022,\u0022bash\u0022,\u0022zsh\u0022]},\u0022text/x-perl\u0022:{\u0022x\u0022:[\u0022perl\u0022]},\u0022text/velocity\u0022:{\u0022e\u0022:[\u0022vm\u0022]},\u0022text/x-erlang\u0022:{\u0022x\u0022:[\u0022escript\u0022]}}";
-WRM._unparsedData["com.atlassian.bitbucket.server.config-wrm-data:page.max.source.lines.data"]="{\u0022value\u0022:\u00225000\u0022,\u0022key\u0022:\u0022page.max.source.lines\u0022,\u0022type\u0022:\u0022NUMBER\u0022}";
-</script>
-<link type="text/css" rel="stylesheet" href="/bitbucket/s/1d8cfa16d16bb338dab441cd01ef3835-CDN/en_US/1236638/1/a8285edafbe2a7b93397828dcff0c2b8/_/download/contextbatch/css/_super/batch.css" media="all">
-<link type="text/css" rel="stylesheet" href="/bitbucket/s/f9801aaf3e32c5809c3224ac744dcfc5-CDN/en_US/1236638/1/32aedb795a9259f96d48518a0b8219cf/_/download/contextbatch/css/bitbucket.page.repository.fileContent,bitbucket.feature.files.fileHandlers,bitbucket.layout.files,bitbucket.layout.branch,bitbucket.layout.repository,bitbucket.layout.entity,bitbucket.layout.base,atl.general,-_super/batch.css?supportedApplication=true" media="all">
-<!--[if lte IE 9]>
-<link type="text/css" rel="stylesheet" href="/bitbucket/s/de98de23436899bcbdd0b830fba1ffe5-CDN/en_US/1236638/1/32aedb795a9259f96d48518a0b8219cf/_/download/contextbatch/css/bitbucket.page.repository.fileContent,bitbucket.feature.files.fileHandlers,bitbucket.layout.files,bitbucket.layout.branch,bitbucket.layout.repository,bitbucket.layout.entity,bitbucket.layout.base,atl.general,-_super/batch.css?conditionalComment=lte+IE+9"  media="all">
-<![endif]-->
-<script type="text/javascript" src="/bitbucket/s/0e7a3b439b46802d24fb3f2b5002082c-CDN/en_US/1236638/1/a8285edafbe2a7b93397828dcff0c2b8/_/download/contextbatch/js/_super/batch.js?locale=en-US" ></script>
-<script type="text/javascript" src="/bitbucket/s/e8003b2a7935fd9c46564d8801a4960b-T/en_US/1236638/1/32aedb795a9259f96d48518a0b8219cf/_/download/contextbatch/js/bitbucket.page.repository.fileContent,bitbucket.feature.files.fileHandlers,bitbucket.layout.files,bitbucket.layout.branch,bitbucket.layout.repository,bitbucket.layout.entity,bitbucket.layout.base,atl.general,-_super/batch.js?analytics-enabled=true&amp;locale=en-US&amp;nps-enabled=true&amp;nps-not-opted-out=true&amp;supportedApplication=true" ></script>
-<meta name="application-name" content="Stash"><link rel="shortcut icon" type="image/x-icon" href="/bitbucket/s/en_US/1236638/1/1.0/_/download/resources/com.atlassian.bitbucket.server.bitbucket-web:favicon/favicon.ico" /></head><body class="aui-page-sidebar bitbucket-theme"><ul id="assistive-skip-links" class="assistive"><li><a href="#aui-sidebar-content">Skip to sidebar navigation</a></li><li><a href="#aui-page-panel-content-body">Skip to content</a></li></ul><div id="page"><!-- start #header --><header id="header" role="banner"><section class="notifications"></section><nav class="aui-header aui-dropdown2-trigger-group" role="navigation"><div class="aui-header-inner"><div class="aui-header-before"><a class=" aui-dropdown2-trigger app-switcher-trigger" aria-controls="app-switcher" aria-haspopup="true" role="button" tabindex="0" data-aui-trigger href="#app-switcher"><span class="aui-icon aui-icon-small aui-iconfont-appswitcher">Linked Applications</span></a><div id="app-switcher" class="aui-dropdown2 aui-style-default" role="menu" aria-hidden="true"><div role="application"><div class="app-switcher-loading">Loading&hellip;</div></div></div><script>
-            (function (NL) {
-                var initialise = function () {
-                    // For some milestones of AUI, the atlassian soy namespace was renamed to aui. Handle that here by ensuring that window.atlassian is defined.
-                    window.atlassian = window.atlassian || window.aui;
-                    new NL.AppSwitcher({
-                        dropdownContents: '#app-switcher'
-                    });
-                };
-                if (NL.AppSwitcher) {
-                    initialise();
-                } else {
-                    NL.onInit = initialise;
-                }
-            }(window.NL = (window.NL || {})));
-            window.NL.environment = {isUserAdmin: false, isAppSuggestionAvailable: false};</script></div><div class="aui-header-primary"><h1 id="logo" class="aui-header-logo aui-header-logo-bitbucket"><a href="https://svn.bcgsc.ca/bitbucket" class="stash"><span class="aui-header-logo-device">Bitbucket</span></a></h1><ul class="aui-nav"><li class=" projects-link"><a href="/bitbucket/projects" class="projects-link" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:projects-menu">Projects</a></li><li class="selected recent-repositories"><a id="repositories-menu-trigger"  class=" aui-dropdown2-trigger" aria-controls="com.atlassian.bitbucket.server.bitbucket-server-web-fragments-repositories-menu" aria-haspopup="true" role="button" tabindex="0" data-aui-trigger>Repositories<span class="icon aui-icon-dropdown"></span></a><div id="com.atlassian.bitbucket.server.bitbucket-server-web-fragments-repositories-menu" class="aui-dropdown2 aui-style-default" role="menu" aria-hidden="true"><div role="application"><div class="aui-dropdown2-section recent-repositories-section"><strong role="presentation" class="aui-dropdown2-heading">Recently viewed</strong><ul class="aui-list-truncate" role="presentation"></ul></div><div class="aui-dropdown2-section public-repo-list-link-section"><ul class="aui-list-truncate" role="presentation"><li role="presentation"><a href="/bitbucket/repos?visibility=public" title="View all publicly accessible repositories in Bitbucket" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:public-repo-list-link">View all public repositories</a></li></ul></div></div></div></li></ul></div><div class="aui-header-secondary"><ul class="aui-nav"><li><form class="aui-quicksearch"><div class="repository-search-trigger"><label class="assistive" for="repository-search">Find a repository...</label><input id="repository-search" type="text" autocomplete="off" placeholder="Find a repository..."/><div class="spinner"></div></div></form></li><li class=" help-link"title="Help"><a class=" aui-dropdown2-trigger aui-dropdown2-trigger-arrowless" aria-controls="com.atlassian.bitbucket.server.bitbucket-server-web-fragments-help-menu" aria-haspopup="true" role="button" tabindex="0" data-aui-trigger><span class="aui-icon aui-icon-small aui-iconfont-help">Help</span><span class="icon aui-icon-dropdown"></span></a><div id="com.atlassian.bitbucket.server.bitbucket-server-web-fragments-help-menu" class="aui-dropdown2 aui-style-default" role="menu" aria-hidden="true"><div role="application"><div class="aui-dropdown2-section help-items-section"><ul class="aui-list-truncate" role="presentation"><li role="presentation"><a href="http://docs.atlassian.com/bitbucketserver/docs-041/Bitbucket+Server+Documentation+Home" title="Go to the online documentation for Bitbucket" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:general-help">Online help</a></li><li role="presentation"><a href="https://www.atlassian.com/git?utm_source=stash&amp;utm_medium=in-app-help&amp;utm_campaign=learn-git" title="Learn about Git commands &amp; workflows" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:learn-git">Learn Git</a></li><li role="presentation"><a href="/bitbucket/getting-started" class="getting-started-page-link" title="Overview of Bitbucket features" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:getting-started-page-help-link">Welcome to Bitbucket</a></li><li role="presentation"><a href="/bitbucket/#" class="keyboard-shortcut-link" title="Discover keyboard shortcuts in Bitbucket" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:keyboard-shortcuts-help-link">Keyboard shortcuts</a></li></ul></div></div></div></li><li class=""title="View your unapproved pull requests"><a href="#inbox" id="inbox-pull-requests" title="View your unapproved pull requests" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-inbox:global-pr-inbox-menu-item">Inbox</a></li><li class="user-dropdown"><a class=" aui-dropdown2-trigger user-dropdown-trigger aui-dropdown2-trigger-arrowless" aria-controls="user-dropdown-menu" aria-haspopup="true" role="button" title="Logged in as Thomas Sierocinski (tsierocinski)" data-container=".aui-header-secondary" tabindex="0" data-aui-trigger><span id="current-user" class="aui-avatar aui-avatar-small" data-emailaddress="tsierocinski@bcgsc.ca" data-username="tsierocinski" data-avatarurl-small="https://secure.gravatar.com/avatar/ffd3c1b51d366a359bff0a3946da9efb.jpg?s=48&amp;d=mm"><span class="aui-avatar-inner"><img src="https://secure.gravatar.com/avatar/ffd3c1b51d366a359bff0a3946da9efb.jpg?s=48&amp;d=mm" alt="Logged in as Thomas Sierocinski (tsierocinski)" /></span></span><span class="icon aui-icon-dropdown"></span></a><div id="user-dropdown-menu" class="aui-dropdown2 aui-style-default" role="menu" aria-hidden="true"><div role="application"><div class="aui-dropdown2-section user-settings-section"><ul class="aui-list-truncate" role="presentation"><li role="presentation"><a href="/bitbucket/profile" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:profile-menu-item">View profile</a></li><li role="presentation"><a href="/bitbucket/account" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:account-menu-item">Manage account</a></li><li role="presentation"><a href="/bitbucket/plugins/servlet/upm/requests?source=header_user" id="upm-requests-link" data-web-item-key="com.atlassian.upm.atlassian-universal-plugin-manager-plugin:bitbucket-upm-requests-menu">Atlassian Marketplace</a></li></ul></div><div class="aui-dropdown2-section user-logout-section"><ul class="aui-list-truncate" role="presentation"><li role="presentation"><a href="/bitbucket/j_atl_security_logout" class="logout-link" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:logout-menu-item">Log out</a></li></ul></div></div></div></li></ul></div></div> <!-- End .aui-header-inner --></nav> <!-- End .aui-header --></header><!-- End #header --><!-- Start #content --><section id="content" role="main" tabindex="-1" data-timezone="480"  data-repoSlug="opencemt" data-projectKey="EDCC" data-repoName="openCEMT" data-projectName="EDCC"><section class="notifications"></section><div id="aui-sidebar-content" class="aui-sidebar "  tabindex="-1"><div class="aui-sidebar-wrapper"><div class="aui-sidebar-body"><script>require('bitbucket/internal/widget/sidebar').preload();</script><header class="aui-page-header"><div class="aui-page-header-inner"><div class="aui-page-header-image"><a href="/bitbucket/projects/EDCC"><span class="aui-avatar aui-avatar-large aui-avatar-project" data-tooltip="EDCC / openCEMT"><span class="aui-avatar-inner"><img src="/bitbucket/projects/EDCC/avatar.png?s=96&amp;v=1448853857953" alt="EDCC" /></span></span></a></div><!-- .aui-page-header-image --><div class="aui-page-header-main entity-item"><ol class="aui-nav aui-nav-breadcrumbs"><li><a href="/bitbucket/projects/EDCC" title="EDCC">EDCC</a></li></ol><h1><span class="entity-name" title="openCEMT">openCEMT</span></h1><div><div class="public-lozenge aui-lozenge aui-lozenge-subtle">Public</div></div></div><!-- .aui-page-header-main --></div><!-- .aui-page-header-inner --></header><!-- .aui-page-header --><nav class="aui-navgroup aui-navgroup-vertical" role="navigation"><div class="aui-navgroup-inner"><div class="aui-sidebar-group aui-sidebar-group-actions"><div class="aui-nav-heading"><strong>Actions</strong></div><ul class="aui-nav"><li class=" clone-repo"><a href="#" id="clone-repo-button" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:repository-clone"class="aui-nav-item" title="Clone this repository"><span class="aui-icon icon-clone"></span><span class="aui-nav-item-label">Clone</span></a></li><li class=" create-branch"><a href="/bitbucket/plugins/servlet/create-branch" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-branch:create-branch-repository-action"class="aui-nav-item"><span class="aui-icon icon-create-branch"></span><span class="aui-nav-item-label">Create branch</span></a></li><li class=" create-pull-request"><a href="/bitbucket/projects/EDCC/repos/opencemt/pull-requests?create" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:repository-pull-request"class="aui-nav-item" title="Create a new pull request"><span class="aui-icon icon-create-pull-request"></span><span class="aui-nav-item-label">Create pull request</span></a></li><li class=" fork-repo"><a href="/bitbucket/projects/EDCC/repos/opencemt?fork" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:repository-fork"class="aui-nav-item" title="Fork this repository"><span class="aui-icon icon-fork"></span><span class="aui-nav-item-label">Fork</span></a></li></ul></div><div class="hidden"><div id="clone-repo-dialog-content"><div class="clone-url"><div class="aui-buttons"><a class=" aui-dropdown2-trigger repository-protocol aui-button" aria-controls="repository-protocol-selector" aria-haspopup="true" role="button" tabindex="0" data-aui-trigger><span class="icon aui-icon-dropdown"></span></a><div id="repository-protocol-selector" class="aui-dropdown2 aui-style-default" role="menu" aria-hidden="true"><div role="application"><ul><li id="ssh-clone-url" data-clone-url="ssh://git@svn.bcgsc.ca:7999/edcc/opencemt.git" data-module-key="ssh-clone-url-default" ><a href="#">SSH</a></li><li id="http-clone-url" data-clone-url="https://tsierocinski@svn.bcgsc.ca/bitbucket/scm/edcc/opencemt.git" data-module-key="http-clone-url" ><a href="#">HTTP</a></li></ul></div></div><input type="text" class="text quick-copy-text stash-text clone-url-input" readonly="readonly" spellcheck="false" value=""/></div><div id="clone-dialog-options"><!-- This is a client-web-panel --></div><p><a target="_blank" href="https://www.atlassian.com/git/tutorials/setting-up-a-repository/git-clone?utm_source=stash&amp;utm_medium=in-app-help&amp;utm_campaign=learn-git-clone">Learn more about cloning repositories</a></p></div><div class="sourcetree-panel"><a id="sourcetree-clone-button" class="aui-button aui-button-primary sourcetree-button"  href="sourcetree://cloneRepo/https://tsierocinski@svn.bcgsc.ca/bitbucket/scm/edcc/opencemt.git" autocomplete="off" tabindex="0">Clone in SourceTree</a><p><a href="http://www.sourcetreeapp.com" target="_blank">Atlassian SourceTree</a> is the free Git and Mercurial client for Windows or Mac.</p></div></div></div><div class="aui-sidebar-group aui-sidebar-group-tier-one sidebar-navigation"><div class="aui-nav-heading"><strong>Navigation</strong></div><ul class="aui-nav"><li class="aui-nav-selected"><a href="/bitbucket/projects/EDCC/repos/opencemt/browse" id="repository-nav-files" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:bitbucket.repository.nav.files"class="aui-nav-item"><span class="aui-icon icon-source"></span><span class="aui-nav-item-label">Source</span></a></li><li class=" commits-nav"><a href="/bitbucket/projects/EDCC/repos/opencemt/commits" id="repository-nav-commits" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:bitbucket.repository.nav.commits"class="aui-nav-item"><span class="aui-icon icon-commits"></span><span class="aui-nav-item-label">Commits</span></a></li><li><a href="/bitbucket/projects/EDCC/repos/opencemt/branches" id="repository-nav-branches" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:bitbucket.repository.nav.branches"class="aui-nav-item"><span class="aui-icon icon-branches"></span><span class="aui-nav-item-label">Branches</span></a></li><li><a href="/bitbucket/projects/EDCC/repos/opencemt/pull-requests" id="repository-nav-pull-requests" data-web-item-key="com.atlassian.bitbucket.server.bitbucket-server-web-fragments:bitbucket.repository.nav.pull-requests"class="aui-nav-item"><span class="aui-icon icon-pull-requests"></span> <span class="aui-nav-item-label">Pull requests</span></a></li></ul></div></div></nav></div><div class="aui-sidebar-footer"><a class="aui-button aui-button-subtle aui-sidebar-toggle aui-sidebar-footer-tipsy" data-tooltip="Expand sidebar ( [ )" href="#"><span class="aui-icon aui-icon-small"></span></a></div></div></div><div class="aui-page-panel content-body" id="aui-page-panel-content-body" tabindex="-1"><div class="aui-page-panel-inner"><section class="aui-page-panel-content"><header class="aui-page-header page-header-flex"><div class="aui-page-header-inner"><div class="aui-page-header-main"><ol class="aui-nav aui-nav-breadcrumbs repository-breadcrumbs"><li><a href="/bitbucket/projects/EDCC" title="EDCC">EDCC</a></li><li class="aui-nav-selected"><a href="/bitbucket/projects/EDCC/repos/opencemt/browse" title="openCEMT">openCEMT</a></li></ol><h2 class="page-panel-content-header">Source</h2></div><!-- .aui-page-header-main --></div><!-- .aui-page-header-inner --></header><!-- .aui-page-header --><div class="aui-toolbar2 branch-selector-toolbar" role="toolbar"><div class="aui-toolbar2-inner"><div class="aui-toolbar2-primary"><div class="aui-group"><div class="aui-item"><div class="aui-buttons"><button id="repository-layout-revision-selector" type="button" class="aui-button searchable-selector-trigger revision-reference-selector-trigger" title="master"><span class="aui-icon aui-icon-small aui-iconfont-devtools-branch">Branch</span><span class="name" title="master" data-id="refs/heads/master" data-revision-ref="{&quot;latestCommit&quot;:&quot;564d9658a9359192c865f08f24ecd2577064085c&quot;,&quot;isDefault&quot;:true,&quot;id&quot;:&quot;refs/heads/master&quot;,&quot;displayId&quot;:&quot;master&quot;,&quot;type&quot;:{&quot;name&quot;:&quot;Branch&quot;,&quot;id&quot;:&quot;branch&quot;}}">master</span></button><button id="branch-actions"  class=" aui-dropdown2-trigger aui-button aui-dropdown2-trigger-arrowless" aria-controls="branch-actions-menu" aria-haspopup="true" role="button" data-aui-trigger autocomplete="off" type="button"><span class="aui-icon aui-icon-small aui-iconfont-more">Branch actions</span><span class="icon aui-icon-dropdown"></span></button></div></div><div class="aui-item"><div class="breadcrumbs"><a href="/bitbucket/projects/EDCC/repos/opencemt/browse">openCEMT</a><span class="sep">/</span><a href="/bitbucket/projects/EDCC/repos/opencemt/browse/WGBS">WGBS</a><span class="sep">/</span><a href="/bitbucket/projects/EDCC/repos/opencemt/browse/WGBS/QC">QC</a><span class="sep">/</span><span class="stub">bamStats.py</span></div></div></div></div><div class="aui-toolbar2-secondary commit-badge-container"><div class="commit-badge-oneline"><span class="aui-avatar aui-avatar-small user-avatar" data-username="tsierocinski"><span class="aui-avatar-inner"><img src="https://secure.gravatar.com/avatar/ffd3c1b51d366a359bff0a3946da9efb.jpg?s=48&amp;d=mm" alt="Thomas Sierocinski" /></span></span><a href="/bitbucket/users/tsierocinski" class="commit-author"title="Thomas Sierocinski">Thomas Sierocinski</a> committed <a  class="commitid"  href="/bitbucket/projects/EDCC/repos/opencemt/commits/72a014e359f7c79cdeaaf117c377b262e76d52f7"   data-commitid="72a014e359f7c79cdeaaf117c377b262e76d52f7">72a014e359f</a><time title="25 August 2016 02:52 PM" datetime="2016-08-25T14:52:35-0700">25 Aug 2016</time></div></div></div></div></section><!-- .aui-page-panel-content --></div><!-- .aui-page-panel-inner --></div><!-- .aui-page-panel --></section><!-- End #content --><!-- Start #footer --><footer id="footer" role="contentinfo"><section class="notifications"></section><section class="footer-body"><ul><li data-key="footer.license.message">Git repository management for enterprise teams powered by <a href="http://www.atlassian.com/software/bitbucket/">Atlassian Bitbucket</a></li></ul><ul><li>Atlassian Bitbucket <span title="1236638ebb13a1f9241288056b4d1891c39ab688" id="product-version" data-commitid="1236638ebb13a1f9241288056b4d1891c39ab688" data-system-build-number="1236638"> v4.1.3</span></li><li data-key="footer.links.documentation"><a href="http://docs.atlassian.com/bitbucketserver/docs-041/Bitbucket+Server+Documentation+Home" target="_blank">Documentation</a></li><li data-key="footer.links.contact.support"><a href="https://support.atlassian.com/secure/SENVerification.jspa?issuetype=1&pid=10740" target="_blank">Contact Support</a></li><li data-key="footer.links.jac"><a href="https://jira.atlassian.com/browse/BSERV" target="_blank">Request a feature</a></li><li data-key="footer.links.about"><a href="/bitbucket/about">About</a></li><li data-key="footer.links.contact.atlassian"><a href="http://www.atlassian.com/company/contact/" target="_blank">Contact Atlassian</a></li></ul><div id="footer-logo"><a href="http://www.atlassian.com/" target="_blank">Atlassian</a></div></section></footer><!-- End #footer --></div><script>(function(loader) {loader.load('bitbucket.layout.repository', {"com.atlassian.bitbucket.server.bitbucket-readme:readme-provider":{"extensions":["md","markdown","mdown","mkdn","mkd","txt","text",""],"extensionsRaw":["txt","text",""],"name":"README"}});loader.load('bitbucket.branch.layout.actions.dropdown', {"com.atlassian.bitbucket.server.bitbucket-compare:compare-branch-action":{"serverCondition":true},"com.atlassian.bitbucket.server.bitbucket-branch:create-branch-action":{"serverCondition":true},"com.atlassian.bitbucket.server.bitbucket-sourcetree-plugin:sourcetree-checkout-action-branch-layout":{"serverCondition":true}});}(_PageDataPlugin));</script><script>require('bitbucket/internal/layout/base').onReady({id : 2861, active: true, name : "tsierocinski", slug : "tsierocinski", displayName : "Thomas Sierocinski", avatarUrl : "https:\/\/secure.gravatar.com\/avatar\/ffd3c1b51d366a359bff0a3946da9efb.jpg?s\x3d48\x26d\x3dmm", emailAddress : "tsierocinski@bcgsc.ca", type : "NORMAL"}, "BitBucket" ); require('bitbucket/internal/widget/keyboard-shortcuts').onReady();</script><script>require('bitbucket/internal/layout/repository').onReady({"slug":"opencemt","id":463,"name":"openCEMT","scmId":"git","state":"AVAILABLE","statusMessage":"Available","forkable":true,"project":{"key":"EDCC","id":167,"name":"EDCC","public":false,"type":"NORMAL","links":{"self":[{"href":"https://svn.bcgsc.ca/bitbucket/projects/EDCC"}]},"avatarUrl":"/bitbucket/projects/EDCC/avatar.png?s=64&v=1448853857953"},"public":true,"links":{"clone":[{"href":"https://tsierocinski@svn.bcgsc.ca/bitbucket/scm/edcc/opencemt.git","name":"http"},{"href":"ssh://git@svn.bcgsc.ca:7999/edcc/opencemt.git","name":"ssh"}],"self":[{"href":"https://svn.bcgsc.ca/bitbucket/projects/EDCC/repos/opencemt/browse"}]}}, '#clone-repo-button', '#clone-repo-dialog-content');</script><div id="branch-actions-menu" class="aui-dropdown2 aui-style-default" role="menu" aria-hidden="true"><div role="application"></div></div><script>require('bitbucket/internal/layout/branch').onReady('#repository-layout-revision-selector');</script><script>require('bitbucket/internal/layout/files').onReady(["WGBS","QC","bamStats.py"],{"latestCommit":"564d9658a9359192c865f08f24ecd2577064085c","isDefault":true,"id":"refs/heads/master","displayId":"master","type":{"name":"Branch","id":"branch"}}, '.branch-selector-toolbar .breadcrumbs',false);</script><script>require('bitbucket/internal/page/source').onReady( "WGBS\/QC\/bamStats.py",{"latestCommit":"564d9658a9359192c865f08f24ecd2577064085c","isDefault":true,"id":"refs/heads/master","displayId":"master","type":{"name":"Branch","id":"branch"}},{"id":"72a014e359f7c79cdeaaf117c377b262e76d52f7","displayId":"72a014e359f","author":{"name":"tsierocinski","emailAddress":"tsierocinski@bcgsc.ca","id":2861,"displayName":"Thomas Sierocinski","active":true,"slug":"tsierocinski","type":"NORMAL","links":{"self":[{"href":"https://svn.bcgsc.ca/bitbucket/users/tsierocinski"}]},"avatarUrl":"http://www.gravatar.com/avatar/ffd3c1b51d366a359bff0a3946da9efb.jpg?s=48&d=mm"},"authorTimestamp":1472161955000,"message":"changed path to samtools","parents":[{"id":"2d62a378bdb903a34ab7a21cd1e4a2223bbb8acc","displayId":"2d62a378bdb"}]},"source", '#content .aui-page-panel-content', 'file-content',10);</script><script type="text/javascript">require('bitbucket/internal/layout/base/menu/recent-repos').initMenu('repositories-menu-trigger');</script></body></html>
+#!/usr/bin/env python
+# coding:utf-8
+# Author:  Richard Corbett
+# Purpose: Provide a python script for iterating and calculate basic stats from a bam file
+# Created: 04/12/2009
+
+from optparse import OptionParser
+import sys
+import os
+import re
+import subprocess
+import fnmatch
+import operator
+import math
+import profile
+import pstats
+# import collections # Not found in all pythons on the network :(
+
+samtools = "/path/to/your/samtools/install/samtools"
+WQT=10
+WsnpQThresh = 40  #parameter was never used so now fixed at 40
+
+usage = """ %prog [options] -b bamFile.bam [-q QUALITY_THRESHOLD] [-c ]
+
+The X coverage is calculated from non-dup, non-chastity, aligned reads.  These 
+reads are multiplied by their read length.
+
+Note that secondary alignments are currently ignored in the analysis.
+
+"""
+def main():
+
+    parser = OptionParser(usage)
+    parser.add_option("-b", "--bamfile", dest="bam",
+                      action="store", type="string",
+                      help="path to bam file.")
+    parser.add_option("-c", dest="chip",
+                      action="store_true",
+                      help="Don't filter chastity reads, used for chip libraries.")  
+    parser.add_option("-2", dest="second",
+                      action="store_true",
+                      help="Use only the second read in a pair to generate results.",
+                      default=False)
+    parser.add_option("-g","--genomesize", dest="gsize",
+                      action="store", type=int,
+                      help="Number of bases in the reference genome.  If provided, will be used to calculte X coverage. Without this parameter, the X coverage will not be printed.",
+                      default=-1) 
+
+    #get at the arguments
+    (options, args) = parser.parse_args()
+    bam = options.bam
+    gsize = options.gsize
+    if (options.bam == None):
+        parser.print_help()
+        sys.exit()
+
+    #Check that our bam file exists
+    if (not os.path.isfile(bam)):
+        sys.stderr.write(bam + " is not a valid file\n")
+        sys.exit()
+
+    if(options.chip == None):
+        keepChastity = False
+    else:
+        keepChastity = True
+
+    #Slurp from our bam file
+    proc = subprocess.Popen(samtools+' view '+bam,
+                            shell=True,
+                            stdout=subprocess.PIPE)
+
+    print "Script_path:\t%s" % (os.path.abspath(sys.argv[0]))
+    print "Bam_path:\t%s" % (os.path.abspath(bam))
+    #print "Quality_threshold:\t%d" % (WsnpQThresh)  #nuked to reduce confusion.  This number is reported below on the lines is affects.
+    print "Reference:\t%s" % (getReference(bam))
+    
+    #Counter variables
+    nChastPass=0
+    nChastFail=0
+    nReads=0
+    mapScores=[0]*11
+    nMapped=0
+    nUnmapped=0
+    nUnAmb=0
+    nAmb=0
+    WnUnambThresh=0
+    nUnAmb0=0  #for counting the number of mismatches in unambiguous alignments
+    nUnAmb1=0
+    nUnAmb2=0
+    nUnAmb3=0
+    nQCsumNoDups=0
+    WnDistinctUniqueThresh=0
+    #WnSnpBases=0
+    WsnpReads=0
+    chr_count={}
+    nPairedAligned=0
+    sumInsert=0
+    WgenecovReads=0
+    WmapScoreQ40=0
+    nDups=0
+    WnDistinctUnique=0
+    bitFlag=0
+    xCalcSum=0
+    readLengths={}
+
+    #compile our regex's in hopes it makes this a little faster
+    m0=re.compile(r'NM:i:0')
+    m1=re.compile(r'NM:i:1')
+    m2=re.compile(r'NM:i:2')
+    m3=re.compile(r'NM:i:3')
+    m0s=re.compile(r'CM:i:0')
+    m1s=re.compile(r'CM:i:1')
+    m2s=re.compile(r'CM:i:2')
+    m3s=re.compile(r'CM:i:3')
+    c_spl=re.compile(r'.*[A-Z]')
+
+    # a dict container for counting bases
+    #bases = collections.defaultdict(int)
+    
+    for line in proc.stdout:
+       
+        linep=line.split("\t")
+        bitFlag=int(linep[1])
+
+        #Skip if secondary alignment
+        if(bitFlag & 256):
+            continue
+        
+        #Do we only want the second reads of the pairs?
+        if(options.second == True and (bitFlag & 64)):
+            continue
+        
+        nReads+=1
+        if( (nReads % 1000000) == 0):
+            print >> sys.stderr, "line number %d" % (nReads)
+
+        l = len(linep[9])
+        if(readLengths.has_key(l)):
+            readLengths[l] +=1
+        else:
+            readLengths[l] = 1
+
+        #check for chastity filtering
+        if((bitFlag & 512)==512 and keepChastity == False):
+            nChastFail+=1
+            continue
+        else:
+            nChastPass+=1
+            
+
+        if((bitFlag & 4) != 4): #Not unmapped
+            nMapped+=1
+            #Add to the mapping score histogram
+            mapScore=int(linep[4])
+            if(mapScore==0):
+                mapScores[0]+=1
+            elif(mapScore>0 and mapScore<10):
+                mapScores[1]+=1
+            elif(mapScore>=10 and mapScore<20):
+                mapScores[2]+=1
+            elif(mapScore>=20 and mapScore<30):
+                mapScores[3]+=1
+            elif(mapScore>=30 and mapScore<40):
+                mapScores[4]+=1
+            elif(mapScore>=40 and mapScore<50):
+                mapScores[5]+=1
+            elif(mapScore>=50 and mapScore<60):
+                mapScores[6]+=1
+            elif(mapScore>=60 and mapScore<70):
+                mapScores[7]+=1
+            elif(mapScore>=70 and mapScore<80):
+                mapScores[8]+=1
+            elif(mapScore>=80 and mapScore<90):
+                mapScores[9]+=1
+            elif(mapScore>=90):
+                mapScores[10]+=1
+
+            if(mapScore != 0):
+                nUnAmb+=1
+            else:
+                nAmb+=1
+
+            if(mapScore >= WQT):
+                WnUnambThresh+=1
+
+            #Count the mismatches in the unique alignments
+            if(mapScore>0):   
+                if(m0.search(line) or m0s.search(line)):
+                    nUnAmb0+=1
+                if(m1.search(line) or m1s.search(line)):
+                    nUnAmb1+=1
+                if(m2.search(line) or m2s.search(line)):
+                    nUnAmb2+=1
+                if(m3.search(line) or m3s.search(line)):
+                    nUnAmb3+=1
+
+            #if(mapScore > WQT):
+            #    WgenecovReads+=1
+
+               
+            #Not dups
+            if((bitFlag & 1024)==0):
+                xCalcSum+=(len(linep[9]))
+                nQCsumNoDups+=1
+                if(mapScore>=WQT):
+                    WnDistinctUniqueThresh+=1
+                if(mapScore>0):
+                    key=linep[2]
+                    if not chr_count.has_key(key):
+                        chr_count[key] = 0
+                    chr_count[key]+=1
+              #      if(mapScore >=40 ):
+              #          WmapScoreQ40+=1
+                    
+        else: #unmapped
+            nUnmapped+=1
+
+        if((bitFlag&2)==2): #paired read
+            nPairedAligned+=1
+            sumInsert+=abs(int(linep[8]))
+
+        if((bitFlag&1024)==1024): #dup flag
+            nDups+=1
+      #  elif((bitFlag&4)!=4 and mapScore >0): #not a dup, aligned, and mapScore > 0
+      #      WnDistinctUnique+=1
+
+        # count the characters in the string and create a dictionary of char:count pairs
+        #if(nReads % 100) :
+        #    for c in linep[9]:
+        #        bases[c] += 1
+
+    #Now spew everything to stdout
+    #print "Read_length:\t%s" % ( ",".join(map(str, readLengths)) )
+    print "Read_length:\t", 
+    l_string = ''
+    for l in readLengths.keys():
+        i_string = "%d:%d" % (l, readLengths[l])
+        if(len(l_string) > 0):
+            l_string = l_string + "," + i_string
+        else:
+            l_string = i_string
+    print l_string
+   
+    print "Total_Number_Of_Reads:\t%d" % (nReads)
+    print "Number_of_Chastity_Passed_Reads:\t%d" % (nChastPass)
+    print "Number_of_Chastity_Failed:\t%d" % (nChastFail)
+    print "Number_of_Duplicates:\t%d" % nDups
+    print "Number_Reads_Aligned:\t%d" % (nMapped)
+    print "Number_Reads_Unaligned:\t%d" % (nUnmapped)
+    print "Mapping_Qualities_of_Aligned:"
+    print "\t0:\t%d" % mapScores[0]
+    print "\t1-9:\t%d" % mapScores[1]
+    print "\t10-19:\t%d" % mapScores[2]
+    print "\t20-29:\t%d" % mapScores[3]
+    print "\t30-39:\t%d" % mapScores[4]
+    print "\t40-49:\t%d" % mapScores[5]
+    print "\t50-59:\t%d" % mapScores[6]
+    print "\t60-69:\t%d" % mapScores[7]
+    print "\t70-79:\t%d" % mapScores[8]
+    print "\t80-89:\t%d" % mapScores[9]
+    print "\t>=90:\t%d" % mapScores[10]
+    print "Number_Unique_Alignments:\t%d" % nUnAmb
+    print "Number_Non_Unique_Alignments:\t%d" % mapScores[0]
+    print "Number_Mismatches_in_Unique_Alignments:"
+    print "\t0_mismatches:\t%d" % nUnAmb0
+    print "\t1_mismatches:\t%d" % nUnAmb1
+    print "\t2_mismatches:\t%d" % nUnAmb2
+    print "\t3_mismatches:\t%d" % nUnAmb3
+    print "Number_of_Paired_Alignments:\t%d" % nPairedAligned
+    if(nPairedAligned>0):
+        print "Average_Insert_Size:\t%d" % (sumInsert/nPairedAligned)
+    else:
+        print "Average_Insert_Size:\t%f" % 0
+    print "Number_of_Uniquely_Aligned_Reads_with_Q_>=_%d:\t%d" % ( WQT, WnUnambThresh)
+    #print "Number_of_Uniquely_Aligned_Reads_without_Dups_Q_>_0:\t%d" % WnDistinctUnique
+    print "Number_of_Uniquely_Aligned_Reads_without_Dups_and_Q_>=_%d:\t%d" % ( WQT, WnDistinctUniqueThresh )
+
+    #Removed Feb, 2012
+    #print "Number_of_Reads_Used_for_SNV_calling_with_Q_>=_%d:\t%d" % (WsnpQThresh, WsnpReads)
+    
+    #Number of bases deprecated -> Aug18, 2010
+    #print "Number_of_Bases_Used_for_SNV_calling_with_Q_>=_%d:\t%d" % (WsnpQThresh, WnSnpBases)
+
+    #print "Number_of_Reads_Used_for_Gene_Coverage_with_Q_>=_%d:\t%d" % (WQT, WgenecovReads )
+    #print "Number_of_Uniquely_Aligned_Reads_without_Dups_and_Q_>=_40:\t%d" % ( WmapScoreQ40 )
+    print "Number_Uniquely_Aligned_Without_Dups_to_Each_Chr:"
+    for i in sorted(chr_count.iterkeys()):
+        print "\t%s:\t%d" % (i, chr_count[i])
+    if(gsize > 0) :
+        print "Effective_Genome_size:\t%d" % (gsize)
+        print "Estimate_for_genome_X_coverage:\t%f" % (float(xCalcSum)/float(gsize))
+    #print "Relative Bases:"
+    #for c in sorted(bases, key=bases.get, reverse=True):
+    #    print '\t%s:%6d' % (c, bases[c])
+    print "END"
+    
+
+#Determine the reference to use from the header of the bam file.
+#Returns None if unavailable
+def getReference(bamFile):
+    rtn = None
+    c = samtools + " view -H " + bamFile
+    for line in subprocess.Popen(c, stdout=subprocess.PIPE, shell=True).stdout.readlines():
+        #print line,
+        if(re.match(r'@SQ.*NCBI-Build-36.1.*', line)):
+            #print bamFile + " appears to be hg18"
+            return "hg18"
+        if(re.match(r'@SQ.*hg19.*', line)):
+            #print bamFile + " appears to be hg19"
+            return "hg19"
+        if(re.match(r'@SQ.*AS:NCBI-Build-37.*', line)):
+            return "hg19a"
+            
+    #if we get this far we didn't find either of the references we are looking for
+    sys.stderr.write("Cannot determine reference from " + bamFile + "\n")
+    return rtn
+    
+    
+if __name__ == "__main__":
+    #p=profile.Profile()
+    #p.run("main()")
+    #s = pstats.Stats(p)
+    #s.sort_stats("time", "name").print_stats()
+
+    main()
+
