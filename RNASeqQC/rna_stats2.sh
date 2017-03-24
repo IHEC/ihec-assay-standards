@@ -15,8 +15,8 @@ if [ $# -lt 3 ]; then
   exit 1
 fi
 
-if [[ -z $PICARD_290 || -z $SAMTOOLS_131 ]]; then 
-  echo "Environment variable PICARD_290 (path to picard jar v2.9.1) and SAMTOOLS_131 (samtools 1.3.1 path) must be set"
+if [[ -z ${PICARD_290+x} || -z ${SAMTOOLS_131+x} ]]; then 
+  echo "Environment variable PICARD_290 (path to picard jar v2.9.0) and SAMTOOLS_131 (path to samtools v1.3.1) must be set"
   exit 1
 fi
 
@@ -32,15 +32,15 @@ cd $WORKING_DIR/$SAMPLE_NAME
 
 #computation of IHEC RNA-seq stats
 #get the fraction of mapped reads
-$SAMTOOLS_131/samtools view -F 0x904 -c $SAMPLE_PATH > $SAMPLE_NAME.n_mapped &
-PID=$! # send this process into background and wait on it before reading $SAMPLE_NAME.n_mapped
+$SAMTOOLS_131/samtools view -F 0x904 -c $SAMPLE_PATH > $SAMPLE_NAME.n_mapped #&
+#PID=$! # send this process into background and wait on it before reading $SAMPLE_NAME.n_mapped
 
 # create 0x900 filtered bam and count those reads at the same time with tee redireting to no_multimap_bam
 # faster because sone concurrently + no uncompressed data streamed
 N_NO_MULTIMAP=$($SAMTOOLS_131/samtools view -b -F 0x900 $SAMPLE_PATH | tee ${SAMPLE_NAME}_no_multimap.bam | $SAMTOOLS_131/samtools view -c -)
 
 # wait on $SAMPLE_NAME.n_mapped process
-wait $PID 
+#wait $PID 
 MAPPED_READS=$(cat $SAMPLE_NAME.n_mapped) 
 echo $N_NO_MULTIMAP | awk -v MAPPED_READS=$MAPPED_READS '{print "FRACTION_MAPPED\t"MAPPED_READS/$1}' > ${SAMPLE_NAME}_read_stats.txt
 
@@ -60,7 +60,7 @@ else
   mkdir -p $TEMP || true
   $PICARD_MARK_DUP_CMD TMP_DIR=$TEMP
 fi  
-awk -F $'\t' '/PERCENT_DUPLICATION/{getline; print "FRACTION_DUPLICATED\t"$8}' ${SAMPLE_NAME}_duplicated.txt >> ${SAMPLE_NAME}_read_stats.txt
+awk -F $'\t' '/PERCENT_DUPLICATION/{getline; print "FRACTION_DUPLICATED\t"$9}' ${SAMPLE_NAME}_duplicated.txt >> ${SAMPLE_NAME}_read_stats.txt
 
 # keep everything while debugging  
 #rm ${SAMPLE_NAME}_noMULTI_noDUP.bam 
