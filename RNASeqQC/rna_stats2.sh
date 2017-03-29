@@ -32,23 +32,17 @@ cd $WORKING_DIR/$SAMPLE_NAME
 
 #computation of IHEC RNA-seq stats
 #get the fraction of mapped reads
-$SAMTOOLS_131/samtools view -F 0x904 -c $SAMPLE_PATH > $SAMPLE_NAME.n_mapped #&
-#PID=$! # send this process into background and wait on it before reading $SAMPLE_NAME.n_mapped
+MAPPED_READS=$($SAMTOOLS_131/samtools view -c -F 0x904 $SAMPLE_PATH) 
 
-# create 0x900 filtered bam and count those reads at the same time with tee redireting to no_multimap_bam
-# faster because sone concurrently + no uncompressed data streamed
 N_NO_MULTIMAP=$($SAMTOOLS_131/samtools view -b -c -F 0x900 $SAMPLE_PATH)
 
-# wait on $SAMPLE_NAME.n_mapped process
-#wait $PID 
-MAPPED_READS=$(cat $SAMPLE_NAME.n_mapped) 
 echo $N_NO_MULTIMAP | awk -v MAPPED_READS=$MAPPED_READS '{print "FRACTION_MAPPED\t"MAPPED_READS/$1}' > ${SAMPLE_NAME}_read_stats.txt
 
 #get the number of reads falling into intergenic regions with samtools
-$SAMTOOLS_131/samtools view -c ${SAMPLE_NAME}_no_multimap.bam -L $INTERGENIC_BED | awk -v MAPPED_READS=$MAPPED_READS '{print "FRACTION_INTERGENIC\t"$1/MAPPED_READS}' >> ${SAMPLE_NAME}_read_stats.txt
+$SAMTOOLS_131/samtools view -c -F 0x900 $SAMPLE_PATH -L $INTERGENIC_BED | awk -v MAPPED_READS=$MAPPED_READS '{print "FRACTION_INTERGENIC\t"$1/MAPPED_READS}' >> ${SAMPLE_NAME}_read_stats.txt
 
 #get the number of reads from rRNA with samtools
-$SAMTOOLS_131/samtools view -c ${SAMPLE_NAME}_no_multimap.bam -L $RRNA_BED | awk -v MAPPED_READS=$MAPPED_READS '{print "FRACTION_RRNA\t"$1/MAPPED_READS}' >> ${SAMPLE_NAME}_read_stats.txt
+$SAMTOOLS_131/samtools view -c -F 0x900 $SAMPLE_PATH -L $RRNA_BED | awk -v MAPPED_READS=$MAPPED_READS '{print "FRACTION_RRNA\t"$1/MAPPED_READS}' >> ${SAMPLE_NAME}_read_stats.txt
 
 #get number of duplicates
 PICARD_MARK_DUP_CMD="java -Xmx4g -jar $PICARD_290/picard.jar MarkDuplicates VALIDATION_STRINGENCY=LENIENT I=$SAMPLE_PATH O=${SAMPLE_NAME}_noMULTI_noDUP.bam M=${SAMPLE_NAME}_duplicated.txt"
