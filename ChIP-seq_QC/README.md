@@ -1,5 +1,3 @@
-# Folder contents:
-
 This folder contains a .PDF file with the definitions and two bash scripts: one to pre-process the BAM files and one to calculate the ChIP-seq QC metrics.
 
 To calculate the metrics please use:
@@ -10,10 +8,12 @@ To calculate the metrics please use:
 
 - plotFingerprint v 2.4.2 (deepTools)
 
+
+## Prerequisites:
 For the scripts to run you have to define the following environment variables:
 
 
-     export PICARD_290=<path-to-picard-tools-1.137>
+     export PICARD_290=<path-to-picard-tools-2.9.0>
 
      export DEEPTOOLS_242=<path-to-deeptools-2.4.2>
 
@@ -28,6 +28,7 @@ Optionally, you should also set the working directory, using:
 
 If $WORKING_DIR is not set, then the scripts will write any output to the current working directory.
 
+## How to use:
 The first step is to pre-process all ChIP-seq datasets, using `preprocess_BAM_files.bash`.
 
 
@@ -48,7 +49,6 @@ This will create a directory per dataset: $WORKING_DIR/$ChIP_sampleName/ where t
 
 The second step is to calculate the ChIP-seq quality statistics, using `calculate_ChIP-seq_QC_metrics.bash`
 
-
      bash calculate_ChIP-seq_QC_metrics.bash \
 
           -c $ChIP_original_BAM_file \
@@ -65,7 +65,9 @@ The second step is to calculate the ChIP-seq quality statistics, using `calculat
      
           > ${ChIP_sampleName}_qc_metrics.tsv
 
-     
+
+Attention: This script will be looking for the files generated using the `preprocess_BAM_files.bash`, so make sure to not chnage the $WORKING_DIR between scripts. 
+
 ## Example:
 
 Suppose we have two ChIP-seq datasets to process:
