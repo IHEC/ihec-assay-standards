@@ -1,94 +1,111 @@
 #!/bin/bash
 
-usage() { echo "Usage: $0 [-c <ChIP_original_BAM_file>] [-t <H3K27ac|H3K27me3|H3K36me3|H3K4me1|H3K4me3|H3K9me3|Input|H2AFZ|H3ac|H3K4me2|H3K9ac>] [--cn <ChIP_sampleName>] [--in <Input_sampleName>] [-p <bed_file>]" 1>&2; exit 1; }
+usage() { 
+  echo "Usage: "`basename $0`" [-t <H3K27ac|H3K27me3|H3K36me3|H3K4me1|H3K4me3|H3K9me3|Input|H2AFZ|H3ac|H3K4me2|H3K9ac>]"
+  echo "          [-f <ChIP_file_prefix>]"
+  echo "          [-u <Input_file_prefix]" 
+  echo "          [-p <ChIP_bed_file>]" 
+  echo "          [-n <threads>]"
+  exit 1
+ }
 
-while getopts ":c:t:n:i:p:" o; do
+## By default the number of threads is set to 1;
+n=1
+
+while getopts "t:f:u:p::n::" o; do
     case "${o}" in
-        c)
-            c=${OPTARG}
-            ;;
         t)
             t=${OPTARG}
-            ((t == "H3K27ac" || t == "H3K27me3" || t == "H3K36me3" || t == "H3K4me1" || t == "H3K4me3" || t == "H3K9me3" || t == "Input" || t == "H2AFZ" || t == "H3ac" || t == "H3K4me2" || t == "H3K9ac" )) || usage
             ;;
-        n)
+        f)
             cname=${OPTARG}
             ;;
-        i)
+        u)
             iname=${OPTARG}
             ;;
         p)
             p=${OPTARG}
+            ;;
+        n)
+            n=${OPTARG}
             ;;
         *)
             usage
             ;;
     esac
 done
-shift $((OPTIND-1))
 
-if [ -z "${c}" ] || [ -z "${t}" ] || [ -z "${cname}" ] || [ -z "${iname}" ] || [ -z "${p}" ]; then
-    usage
-fi
-
-export PATH=${PATH}:/homes/kostadim/bin/:/nfs/1000g-work/G1K/work/bin/bedtools2-2.20.1/bin/
-
-## The following commands assume that there is a pair of BAM files, one for the ChIP and one for the Input, $ChIP_original_BAM_file and $Input_original_BAM_file for two samples labelled, $ChIP_sampleName and $Input_sampleName, respectively.
-## The following steps are shown for the $ChIP_sampleName but have to be applied to the $Input_sampleName too:
-
-## Sort the BAM file by coordinate
-if [[ ! -s ${cname}_original.sorted.bam ]]
+## Set the working directory to current directory, if one hasn't been specified.
+if [[ -z ${WORKING_DIR} ]];
 then
-  java -Xmx2048m -jar /nfs/1000g-work/G1K/work/bin/picard-tools-1.137/picard.jar SortSam INPUT=$c OUTPUT=${cname}_original.sorted.bam SORT_ORDER=coordinate VALIDATION_STRINGENCY=SILENT
+  echo "The WORKING_DIR variable isn't set. The current directory will be used instead." >&2
+  WORKING_DIR=${QC_DIR:-"."}
 fi
 
-## Mark, but not remove, duplicate reads
-if [[ ! -s ${cname}_markDup.bam ]]
+## If the $WORKING_DIR/Input_prefix/Input_prefix_dedup.bam file doesn't exist, then throw an error 
+if [[  ! -s $WORKING_DIR/${iname}/${iname}_dedup.bam ]]
 then
-  java -Xmx2048m -jar /nfs/1000g-work/G1K/work/bin/picard-tools-1.137/picard.jar MarkDuplicates INPUT=${cname}_original.sorted.bam OUTPUT=${cname}_markDup.bam METRICS_FILE=${cname}_original.sorted_metrics.out REMOVE_DUPLICATES=false ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT
+  echo "ERROR: The $WORKING_DIR/${iname}/${iname}_dedup.bam file doesn't exist or is empty." >&2
+  echo "Make sure that the matched deduplicated Input BAM file is $WORKING_DIR/${iname}/${iname}_dedup.bam. Exiting now.." >&2
+  exit 1;
 fi
 
-## Remove unmapped reads and those with mapping quality less than 5:
-if [[ ! -s ${cname}_quality_filtered.bam ]]
+if [[ ( -z "${p}" || ! -s $p ) && ! "$t" == "Input" ]]
 then
-  samtools view -b -F 4 -q 5 ${cname}_markDup.bam > ${cname}_quality_filtered.bam
+  echo "ERROR: Your sample isn't of type Input but you're not providing a BED file with the peaks, or the file doesn't exist or is empty." >&2
+  echo "Run again providing the correct BED file or change experiment type. Exiting now.." >&2
+  exit 1;
 fi
 
-## Remove duplicate reads and those with mapping quality less than 5:
-if [[ ! -s ${cname}_dedup.bam ]]
-then 
-  ## Remove duplicate reads:
-  samtools view -b -F 1024 ${cname}_quality_filtered.bam > ${cname}_dedup.bam
+if [[ -z "${t}" || -z "${cname}" || -z "${iname}" ]]
+then
+  usage
+fi
 
-  ## Index the final deduplicated BAM file
-  samtools index ${cname}_dedup.bam
+if [[ ! ( "$t" == "H3K27ac" || "$t" == "H3K27me3" || "$t" == "H3K36me3" || "$t" == "H3K4me1" || "$t" == "H3K4me3" || "$t" == "H3K9me3" || "$t" == "Input" || "$t" == "H2AFZ" || "$t" == "H3ac" || "$t" == "H3K4me2" || "$t" == "H3K9ac" ) ]]
+then
+  echo "The experiment type defined isn't one of the following." >&2
+  echo "H3K27ac | H3K27me3 | H3K36me3 | H3K4me1 | H3K4me3 | H3K9me3 | Input | H2AFZ | H3ac | H3K4me2 | H3K9ac" >&2
+fi 
+
+if [[ -z ${PICARD_290+x} || -z ${SAMTOOLS_131+x} || -z ${DEEPTOOLS_242+x} ]]; then 
+  echo "Environment variable PICARD_290 (path to picard jar v2.9.0), " >&2
+  echo "SAMTOOLS_131 (path to samtools v1.3.1) and " >&2
+  echo "DEEPTOOLS_242 (path to deeptools v2.4.2) must be set" >&2
+  exit 1
+fi
+
+if [[ ! -s $WORKING_DIR/$cname/${cname}_dedup.bam ]]
+then
+  echo "ERROR: File $WORKING_DIR/$cname/${cname}_dedup.bam doesn't exist or is empty. Your sample doesn't seem to have been preprocessed yet." >&2
+  echo "Please, run preprocess_BAM_files.bash before running this script. Exiting now.." >&2
+  exit 1;
+fi
+
+if [[  ! -s $WORKING_DIR/$iname/${iname}_dedup.bam ]]
+then
+  echo "ERROR: File $WORKING_DIR/$iname/${iname}_dedup.bam doesn't exist or is empty. The matched Input sample you provided doesn't seem to have been preprocessed yet." >&2
+  echo "Please, run preprocess_BAM_files.bash on the matched Input sample before running this script. Exiting now.." >&2
+  exit 1;
 fi
 
 #2.	Mappability
 #We want to extract three mapping statistics:
 ## The original number of reads and the number of those aligned:
-if [[ ! -s ${cname}_original_flagstat.txt ]]
+if [[ ! -s $WORKING_DIR/${cname}/${cname}_original_flagstat.txt ]]
 then
-  samtools flagstat ${cname}_markDup.bam > ${cname}_markDup_flagstat.txt
+  ${SAMTOOLS_131}/samtools flagstat $WORKING_DIR/${cname}/${cname}_markDup.bam > $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt
 fi
 
-total_reads=`grep "in total" ${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* in total .*//'`
-mapped_reads=`grep "mapped (" ${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* mapped (.*)//'`
-dupped_reads=`grep "duplicates" ${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* duplicates$//'`
+total_reads=`grep "in total" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* in total .*//'`
+mapped_reads=`grep "mapped (" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* mapped (.*)//'`
+dupped_reads=`grep "duplicates" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* duplicates$//'`
 dup_rate=$(echo "${dupped_reads}/${mapped_reads}" | bc -l)
 
 ## Finally, the number of singletons for paired-end data sets can be calculated using:
-left_singletons=`grep "singletons" ${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* singletons .*//'`
-right_singletons=`grep "singletons" ${cname}_markDup_flagstat.txt | sed -e 's/[[:digit:]]* + //;s/ singletons .*//'`
-singletons=$((left_singletons+right_singletons))
+singletons=`grep "singletons" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* singletons .*//'`
 
-## The final number of reads:
-if [[ ! -s ${cname}_dedup_flagstat.txt ]]
-then
-    samtools flagstat ${cname}_dedup.bam > ${cname}_dedup_flagstat.txt
-fi
-
-final_reads=`grep "mapped (" ${cname}_dedup_flagstat.txt | sed -e 's/ + [[:digit:]]* mapped (.*)//'`
+final_reads=`${SAMTOOLS_131}/samtools flagstat $WORKING_DIR/${cname}/${cname}_dedup.bam | grep "mapped (" | sed -e 's/ + [[:digit:]]* mapped (.*)//'`
 
 #3.	Calculating Jensen-Shannon distance (JSD)
 
@@ -96,27 +113,32 @@ final_reads=`grep "mapped (" ${cname}_dedup_flagstat.txt | sed -e 's/ + [[:digit
 ## Attention: Regarding the bin size (specified in the command below by the ‘-bs’ option) there hasn’t been an agreement on what the optimal bin size is yet. There have been discussions on adopting smaller bin sizes for the sharp peaks and larger bin sizes for the broad peaks.
 ## No need to remove the blacklisted regions for the JSD calculation.
 
-if [[ ! -s ${cname}_fingerprint.txt ]]
+if [[ ! -s $WORKING_DIR/${cname}/${cname}_fingerprint.txt ]]
 then
-  if [[ type == "H3K27ac" || type == "H3K4me3" || type == "H2AFZ" || type == "H3ac" || type == "H3K4me2" || type == "H3K9ac" ]]
+
+  if [[ "$t" == "H3K27ac" || "$t" == "H3K4me3" || "$t" == "H2AFZ" || "$t" == "H3ac" || "$t" == "H3K4me2" || "$t" == "H3K9ac" ]]
   then
     bin_size=200
   else
     bin_size=1000
   fi
 
-  plotFingerprint -b ${cname}_dedup.bam ${iname}_dedup.bam -bs ${bin_size} -l ${cname} ${iname} --JSDsample ${iname}_dedup.bam --outQualityMetrics ${cname}_fingerprint.txt -plot ${cname}_fingerprint.png -p 8
+  echo "Experiment type: $t and bin size: $bin_size" >&2
 
+  $DEEPTOOLS_242/plotFingerprint -b $WORKING_DIR/${cname}/${cname}_dedup.bam $WORKING_DIR/${iname}/${iname}_dedup.bam -bs ${bin_size} -l ${cname} ${iname} --JSDsample $WORKING_DIR/${iname}/${iname}_dedup.bam --outQualityMetrics $WORKING_DIR/${cname}/${cname}_fingerprint.txt -plot $WORKING_DIR/${cname}/${cname}_fingerprint.png -p $n
 fi
 
-js_dist=`grep ${cname} ${cname}_fingerprint.txt | cut -f 8`
-chance_div=`grep ${cname} ${cname}_fingerprint.txt | cut -f 12` 
-
+js_dist=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 8`
+chance_div=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 12`
 
 #4.     Calculating FRiP scores
-
-reads_under_peaks=`bedtools intersect -wa -bed -abam ${cname}_dedup.bam -b ${p} | wc -l`
-frip=$(echo "${reads_under_peaks}/${final_reads}" | bc -l)
+if [[ "$t" == "Input" ]]
+then
+  frip=0
+else
+  reads_under_peaks=`${SAMTOOLS_131}/samtools view -c -L ${p} $WORKING_DIR/${cname}/${cname}_dedup.bam`
+  frip=$(echo "${reads_under_peaks}/${final_reads}" | bc -l)
+fi
 
 printf "ChIP_name\tInput_name\ttotal_reads\tmapped_reads\tdupped_reads\tdup_rate\tsingletons\tfinal_reads\tjs_dist\tchance_div\tfrip\n" 
 printf "%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%d\t%.4f\t%.4f\t%.4f\n" "$cname" "$iname" "$total_reads" "$mapped_reads" "$dupped_reads" "$dup_rate" "$singletons" "$final_reads" "$js_dist" "$chance_div" "$frip"

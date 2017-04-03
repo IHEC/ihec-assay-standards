@@ -1,25 +1,6 @@
 # Folder contents:
 
-This folder contains a .PDF file with the definitions and a bash script to calculate the ChIP-seq QC metrics.
-
-Note: v0.3 has only been tested on single-end ChIP-seq datasets. 
-
-Here's an example of how to run the script:
-
-
-     bash calculate_ChIP-seq_QC_metrics.bash \
-
-          -c $ChIP_original_BAM_file \
-
-          -t H3K4me3 \
-     
-          -n $ChIP_sampleName \
-     
-          -i $Input_sampleName \
-     
-          -p $bed_file \
-     
-          > ${ChIP_sampleName}_qc_metrics.tsv
+This folder contains a .PDF file with the definitions and two bash scripts: one to pre-process the BAM files and one to calculate the ChIP-seq QC metrics.
 
 To calculate the metrics please use:
 
@@ -29,4 +10,94 @@ To calculate the metrics please use:
 
 - plotFingerprint v 2.4.2 (deepTools)
 
-- bedtools v 2.26
+For the scripts to run you have to define the following environment variables:
+
+
+     export PICARD_290=<path-to-picard-tools-1.137>
+
+     export DEEPTOOLS_242=<path-to-deeptools-2.4.2>
+
+     export SAMTOOLS_131=<path-to-samtools-1.3.1>
+
+
+Optionally, you should also set the working directory, using:
+
+
+     export $WORKING_DIR=<path-to-working-directory>
+
+
+If $WORKING_DIR is not set, then the scripts will write any output to the current working directory.
+
+The first step is to pre-process all ChIP-seq datasets, using `preprocess_BAM_files.bash`.
+
+
+     bash preprocess_BAM_files.bash \
+          
+          -c $ChIP_original_BAM_file \
+
+          -f $ChIP_sampleName 
+
+
+This will create a directory per dataset: $WORKING_DIR/$ChIP_sampleName/ where the following files per dataset will be stored:
+
++ ${ChIP_sampleName}_original.sorted.bam: if the original BAM file is unsorted, a new sorted BAM file will be created
++ ${ChIP_sampleName}_markDup.bam: a BAM file where duplicates are marked
++ ${ChIP_sampleName}_original.sorted_metrics.out: the METRICS_FILE reported by MarkDuplicates
++ ${ChIP_sampleName}_quality_filtered.bam: the final BAM file without duplicates, unampped reads  or reads with mapping quality < 5
++ ${ChIP_sampleName}_dedup.bam.bai
+
+The second step is to calculate the ChIP-seq quality statistics, using `calculate_ChIP-seq_QC_metrics.bash`
+
+
+     bash calculate_ChIP-seq_QC_metrics.bash \
+
+          -c $ChIP_original_BAM_file \
+
+          -t <H3K27ac|H3K27me3|H3K36me3|H3K4me1|H3K4me3|H3K9me3|Input|H2AFZ|H3ac|H3K4me2|H3K9ac> \
+     
+          -f $ChIP_sampleName \ 
+     
+          -u $Input_sampleName \ 
+     
+          -p $bed_file \ ## Optional, only provide it when the  set is NOT an Input
+
+          -n no_threads \ ## Optional, by default is set to 1
+     
+          > ${ChIP_sampleName}_qc_metrics.tsv
+
+     
+## Example:
+
+Suppose we have two ChIP-seq datasets to process:
+1. a H3K4me3 with the BWA output being stored in a file called: `S00XDKH1.ERX712764.H3K4me3.unfiltered.bwa.GRCh38.20150503.bam` and the peaks stored in a file called: `S00XDKH1.ERX712764.H3K4me3.bwa.GRCh38.20150527.bed.gz`
+2. an Inout with the BWA outut being stored in a file caled: `S00XDKH1.ERX941048.Input.unfiltered.bwa.GRCh38.20150503.bam` 
+
+We would first preprocess both datasets using the two following commands:
+
+
+     bash preprocess_BAM_files.bash \
+          -c S00XDKH1.ERX712764.H3K4me3.unfiltered.bwa.GRCh38.20150503.bam \
+          -f S00XDKH1.ERX712764.H3K4me3
+
+     bash preprocess_BAM_files.bash \
+          -c S00XDKH1.ERX941048.Input.unfiltered.bwa.GRCh38.20150503.bam \
+          -f S00XDKH1.ERX941048.Input
+     
+
+And then calculate the ChIP-seq statistics using the following commands:
+
+
+     bash calculate_ChIP-seq_QC_metrics.bash \
+          -t H3K4me3 -n 8 \
+          -f S00XDKH1.ERX712764.H3K4me3 \
+          -u S00XDKH1.ERX941048.Input \
+          -p S00XDKH1.ERX712764.H3K4me3.bwa.GRCh38.20150527.bed.gz
+
+
+     bash calculate_ChIP-seq_QC_metrics.bash \
+          -t Input \
+          -f S00XDKH1.ERX941048.Input \
+          -u S00XDKH1.ERX941048.Input
+
+
+
