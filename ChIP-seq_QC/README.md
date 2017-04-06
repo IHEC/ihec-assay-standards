@@ -6,7 +6,7 @@ To calculate the metrics please use:
 
 - picard v 2.9.0
 
-- plotFingerprint v 2.4.2 (deepTools)
+- plotFingerprint v 2.5.0.1 (deepTools)
 
 
 ## Prerequisites:
@@ -15,7 +15,7 @@ For the scripts to run you have to define the following environment variables:
 
      export PICARD_290=<path-to-picard-tools-2.9.0>
 
-     export DEEPTOOLS_242=<path-to-deeptools-2.4.2>
+     export DEEPTOOLS_2501=<path-to-deeptools-2.5.0.1>
 
      export SAMTOOLS_131=<path-to-samtools-1.3.1>
 
@@ -27,6 +27,12 @@ Optionally, you should also set the working directory, using:
 
 
 If $WORKING_DIR is not set, then the scripts will write any output to the current working directory.
+
+
+     export $TMP_DIR=<path-to-tmp-dir>
+
+
+If $TMP_DIR is set, then a dataset-specific subfolder will be created that will be used when running picard tools.
 
 ## How to use:
 The first step is to pre-process all ChIP-seq datasets, using `preprocess_BAM_files.bash`.

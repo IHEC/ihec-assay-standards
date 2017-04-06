@@ -40,11 +40,19 @@ fi
 mkdir -p $WORKING_DIR/$cname || true
 cd $WORKING_DIR/$cname
 
-## Sort the original BAM file by coordinate, if it isn't yet.
+## Create dataset-speciic TMP_DIR for picard, if $TMP_DIR is set.
+if [[ -z $TMP_DIR ]]; then
+  $PICARD_TMP_DIR=""
+else
+  TEMP="$TMP_DIR/${cname}/temp"
+  mkdir -p $TEMP || true
+  $PICARD_TMP_DIR="TMP_DIR=$TEMP"
+fi  
 
+## Sort the original BAM file by coordinate, if it isn't yet.
 if ! $SAMTOOLS_131/samtools view -H $file2process | grep -q "SO:coordinate"
 then
-  java -Xmx2048m -jar $PICARD_290/picard.jar SortSam INPUT=$c OUTPUT=${cname}_original.sorted.bam SORT_ORDER=coordinate VALIDATION_STRINGENCY=SILENT
+  java -Xmx2048m -jar $PICARD_290/picard.jar SortSam INPUT=$c OUTPUT=${cname}_original.sorted.bam SORT_ORDER=coordinate VALIDATION_STRINGENCY=SILENT $PICARD_TMP_DIR
 
   file_to_mark_duplicates=${cname}_original.sorted.bam
 else
@@ -54,11 +62,11 @@ fi
 ## Mark, but not remove, duplicate reads
 if [[ ! -s ${cname}_markDup.bam ]]
 then
-  java -Xmx2048m -jar $PICARD_290/picard.jar MarkDuplicates INPUT=$file_to_mark_duplicates OUTPUT=${cname}_markDup.bam METRICS_FILE=${cname}_original.sorted_metrics.out REMOVE_DUPLICATES=false ASSUME_SORTED=true VALIDATION_STRINGENCY=SILENT
+  java -Xmx2048m -jar $PICARD_290/picard.jar MarkDuplicates INPUT=$file_to_mark_duplicates OUTPUT=${cname}_markDup.bam METRICS_FILE=${cname}_original.sorted_metrics.out REMOVE_DUPLICATES=false ASSUME_SORTED=true VALIDATION_STRINGENCY=LENIENT $PICARD_TMP_DIR
 fi
 
 ## Remove unmapped read, duplicate reads and those with mapping quality less than 5:
-${SAMTOOLS_131}/samtools view -b -F 1028 -q 5 ${cname}_markDup.bam > ${cname}_dedup.bam
+${SAMTOOLS_131}/samtools view -b -F 3844 -q 5 ${cname}_markDup.bam > ${cname}_dedup.bam
 
 ## Index the final deduplicated BAM file
 ${SAMTOOLS_131}/samtools index ${cname}_dedup.bam
