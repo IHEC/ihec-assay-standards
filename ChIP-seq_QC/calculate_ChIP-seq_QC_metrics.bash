@@ -35,11 +35,10 @@ while getopts "t:f:u:p::n::" o; do
     esac
 done
 
-## Set the working directory to current directory, if one hasn't been specified.
-if [[ -z ${WORKING_DIR} ]];
-then
-  echo "The WORKING_DIR variable isn't set. The current directory will be used instead." >&2
-  WORKING_DIR=${QC_DIR:-"."}
+## Set the working directory to current directory, if one hasn't been set.
+if [[ -z ${WORKING_DIR+x} ]]; then
+  WORKING_DIR="."
+  echo "WORKING_DIR unset; used default: $WORKING_DIR"
 fi
 
 ## If the $WORKING_DIR/Input_prefix/Input_prefix_dedup.bam file doesn't exist, then throw an error 
@@ -122,10 +121,8 @@ then
   else
     bin_size=1000
   fi
-
   echo "Experiment type: $t and bin size: $bin_size" >&2
-
-  $DEEPTOOLS_242/plotFingerprint -b $WORKING_DIR/${cname}/${cname}_dedup.bam $WORKING_DIR/${iname}/${iname}_dedup.bam -bs ${bin_size} -l ${cname} ${iname} --JSDsample $WORKING_DIR/${iname}/${iname}_dedup.bam --outQualityMetrics $WORKING_DIR/${cname}/${cname}_fingerprint.txt -plot $WORKING_DIR/${cname}/${cname}_fingerprint.png -p $n
+  $DEEPTOOLS_2501/plotFingerprint -b $WORKING_DIR/${cname}/${cname}_dedup.bam $WORKING_DIR/${iname}/${iname}_dedup.bam -bs ${bin_size} -l ${cname} ${iname} --JSDsample $WORKING_DIR/${iname}/${iname}_dedup.bam --outQualityMetrics $WORKING_DIR/${cname}/${cname}_fingerprint.txt -plot $WORKING_DIR/${cname}/${cname}_fingerprint.png -p $n
 fi
 
 js_dist=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 8`
