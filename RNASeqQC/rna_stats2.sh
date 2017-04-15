@@ -57,5 +57,4 @@ fi
 awk -F $'\t' '/PERCENT_DUPLICATION/{getline; print "FRACTION_DUPLICATED\t"$9}' ${SAMPLE_NAME}_duplicated.txt >> ${SAMPLE_NAME}_read_stats.txt
 
 # keep everything while debugging  
-#rm ${SAMPLE_NAME}_noMULTI_noDUP.bam 
 #rm ${SAMPLE_NAME}_duplicated.txt
