@@ -1,6 +1,6 @@
 #!/bin/bash
 
-set -eufx -o pipefail # -x is noisy but keep on till in production 
+set -euf -o pipefail 
 
 if [ $# -lt 3 ]; then
   echo
@@ -56,5 +56,5 @@ else
 fi  
 awk -F $'\t' '/PERCENT_DUPLICATION/{getline; print "FRACTION_DUPLICATED\t"$9}' ${SAMPLE_NAME}_duplicated.txt >> ${SAMPLE_NAME}_read_stats.txt
 
-# keep everything while debugging  
-#rm ${SAMPLE_NAME}_duplicated.txt
+rm ${SAMPLE_NAME}_noMULTI_noDUP.bam 
+rm ${SAMPLE_NAME}_duplicated.txt
