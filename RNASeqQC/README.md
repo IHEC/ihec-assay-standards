@@ -18,7 +18,10 @@ For the script to run you have to define the following environment variables:
 
      export $TMP_DIR=<path-to-tmp-dir>
 
+Required computational resources:
 
+- 1 CPU Core 
+- 4 GB RAM
 
 ## How to use:
 To run the statistics on your BAM file mapped to the human genome (assembly GRCh37 or GRCh38) you need to provide the script with the BAM file to be analyzed and two BED files (provided in the above subdirectories), one containing intergenic regions and one with rRNA coordinates as the following:
