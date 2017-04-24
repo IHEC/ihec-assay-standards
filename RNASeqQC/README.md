@@ -7,6 +7,7 @@ To calculate the metrics please use:
 - picard v 2.9.0
 
 
+
 ## Prerequisites:
 For the script to run you have to define the following environment variables:
 
@@ -17,7 +18,6 @@ For the script to run you have to define the following environment variables:
 
      export $TMP_DIR=<path-to-tmp-dir>
 
-The script will create a folder in the chosen working directory with the name of the bam file. A statistics output file will be written inside in text format. This allows running many samples in parallel in your computational environment. Temporary files (e.g. duplicate marked BAM files) are removed to minimize disk usage.
 
 
 ## How to use:
@@ -33,6 +33,9 @@ To run the statistics on your BAM file mapped to the human genome (assembly GRCh
 	   1. path to BAM file to be analyzed
 	   2. Bed file with intergenic coordinates
 	   3. Bed file with rRNA coordinates
+
+
+The script will create a folder in the chosen working directory with the name of the bam file. A statistics output file will be written inside in text format. This allows running many samples in parallel in your computational environment. Temporary files (e.g. duplicate marked BAM files) are removed to minimize disk usage.
 
 
 ## Example:
