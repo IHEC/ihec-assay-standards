@@ -91,9 +91,13 @@ fi
 #2.	Mappability
 #We want to extract three mapping statistics:
 ## The original number of reads and the number of those aligned:
-if [[ ! -s $WORKING_DIR/${cname}/${cname}_original_flagstat.txt ]]
+if [[ ! -s $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt ]]
 then
   ${SAMTOOLS_131}/samtools flagstat $WORKING_DIR/${cname}/${cname}_markDup.bam > $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt
+
+  echo "return[run samtools flagstat]:$? "
+else
+  echo "samtools flagstat .txt exists: ${cname}_markDup_flagstat.txt"
 fi
 
 total_reads=`grep "in total" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* in total .*//'`
@@ -121,12 +125,24 @@ then
   else
     bin_size=1000
   fi
+
   echo "Experiment type: $t and bin size: $bin_size" >&2
+
   $DEEPTOOLS_2501/plotFingerprint -b $WORKING_DIR/${cname}/${cname}_dedup.bam $WORKING_DIR/${iname}/${iname}_dedup.bam -bs ${bin_size} -l ${cname} ${iname} --JSDsample $WORKING_DIR/${iname}/${iname}_dedup.bam --outQualityMetrics $WORKING_DIR/${cname}/${cname}_fingerprint.txt -plot $WORKING_DIR/${cname}/${cname}_fingerprint.png -p $n
+
+  echo "return[run deeptools plotFingerprint]:$? "
+else
+  echo "deeptools plotFingerprint .txt exists: ${cname}_fingerprint.txt"
 fi
 
-js_dist=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 8`
-chance_div=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 12`
+if [[ "$t" == "Input" && "${cname}" == "${iname}" ]]
+then
+  js_dist=0
+  chance_div=0
+else
+  js_dist=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 8`
+  chance_div=`grep ${cname} $WORKING_DIR/${cname}/${cname}_fingerprint.txt | cut -f 12`
+fi
 
 #4.     Calculating FRiP scores
 if [[ "$t" == "Input" ]]
@@ -137,7 +153,7 @@ else
   frip=$(echo "${reads_under_peaks}/${final_reads}" | bc -l)
 fi
 
-printf "ChIP_name\tInput_name\ttotal_reads\tmapped_reads\tdupped_reads\tdup_rate\tsingletons\tfinal_reads\tjs_dist\tchance_div\tfrip\n" 
-printf "%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%d\t%.4f\t%.4f\t%.4f\n" "$cname" "$iname" "$total_reads" "$mapped_reads" "$dupped_reads" "$dup_rate" "$singletons" "$final_reads" "$js_dist" "$chance_div" "$frip"
+printf "ChIP_name\tInput_name\ttotal_reads\tmapped_reads\tdupped_reads\tdup_rate\tsingletons\tfinal_reads\tjs_dist\tchance_div\tfrip\n" > $WORKING_DIR/${cname}/${cname}_read_stats.txt
+printf "%s\t%s\t%d\t%d\t%d\t%.4f\t%d\t%d\t%.4f\t%.4f\t%.4f\n" "$cname" "$iname" "$total_reads" "$mapped_reads" "$dupped_reads" "$dup_rate" "$singletons" "$final_reads" "$js_dist" "$chance_div" "$frip" >> $WORKING_DIR/${cname}/${cname}_read_stats.txt
 
 

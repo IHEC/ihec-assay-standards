@@ -26,10 +26,10 @@ then
   exit 1
 fi
 
-if [[ -z ${PICARD_290+x} || -z ${SAMTOOLS_131+x} || -z ${DEEPTOOLS_242+x} ]]; then
+if [[ -z ${PICARD_290+x} || -z ${SAMTOOLS_131+x} || -z ${DEEPTOOLS_2501+x} ]]; then
   echo "Environment variable PICARD_290 (path to picard jar v2.9.0), " >&2
   echo "SAMTOOLS_131 (path to samtools v1.3.1) and " >&2
-  echo "DEEPTOOLS_242 (path to deeptools v2.4.2) must be set" >&2
+  echo "DEEPTOOLS_2501 (path to deeptools v2.5.0.1) must be set" >&2
   exit 1
 fi
 
