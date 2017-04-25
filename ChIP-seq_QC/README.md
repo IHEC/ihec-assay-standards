@@ -74,6 +74,10 @@ The second step is to calculate the ChIP-seq quality statistics, using `calculat
 
 Attention: This script will be looking for the files generated using the `preprocess_BAM_files.bash`, so make sure to not chnage the $WORKING_DIR between scripts. 
 
+## Output:
+
+The ChIP-seq metrics are reported in a text file `$ChIP_sampleName_read_stats.txt` created in the directory `$ChIP_sampleName`.
+
 ## Example:
 
 Suppose we have two ChIP-seq datasets to process:
