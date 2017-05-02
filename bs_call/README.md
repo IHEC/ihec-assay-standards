@@ -14,8 +14,8 @@ If your system does not have GSL library then you can download it from [GSL](htt
 
 Once GSL is already available on your system then you can compile and install bscall.
 
-1) Change GSL library paths. In order to compile bscall you must specify the GSL headers and library directories. To do that edit Gsl.mk file with the proper
-paths. Just modify two lines starting with GSL_LIB and GSL_INC.
+1) Change GSL library paths. In order to compile bscall you must specify the GSL headers and library directories. 
+   To do that, edit Gsl.mk file with the proper paths. Just modify two lines starting with GSL_LIB and GSL_INC.
 
 Gsl.mk:
 
@@ -30,7 +30,7 @@ Compile:
 
     make all
 
-3) Installation. If the compilation process has been successfully completed then a binary file should be found at bin directory. Just copy it to a directory include in your
+3) Installation. If the compilation process has been successfully completed then a binary file should be found at bin directory. Just copy it to a directory included in your
 $PATH.
 
 Copy binary:
@@ -45,9 +45,9 @@ Run bscall from a BAM file to get a bcf output:
 
     samtools view -h my_aligned.bam chr1 | bs_call -r my_reference.fasta -p -L5 -n my_sample_name | bcftools convert -o mysample_chr1.bcf -O b
 
-This command assumes you have samtools and bcftools already installed on your system.
+This command assumes that you have samtools and bcftools already installed on your system.
 
-The parameters configured are -p (Paired End Data) -L5 (5 bases to trim from left of read pair).
+The parameters configured for this example are -p (Paired End Data) and -L5 (5 bases to trim from left of read pair).
 
 
 ---------
