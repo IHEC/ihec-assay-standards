@@ -102,6 +102,7 @@ typedef struct {
   uint64_t reverse_position;
 	uint64_t reference_span[2];
   uint64_t idx;
+	uint64_t align_length;
   int64_t template_len;
   char* tag;
   gt_string* seq_name;

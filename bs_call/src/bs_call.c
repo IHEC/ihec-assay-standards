@@ -199,13 +199,23 @@ static int cmp_al(const void *s1, const void *s2) {
   const align_details *al1 = *(align_details **)s1,
                       *al2 = *(align_details **)s2;
   int a = 0;
-  if (al1->forward_position < al2->forward_position) {
+	int x1, x2, y1, y2;
+	if(al1->forward_position > 0) {
+		x1 = al1->forward_position;
+		y1 = al1->reverse_position > 0 ? al1->reverse_position : x1;
+	} else x1 = y1 = al1->reverse_position;
+	if(al2->forward_position > 0) {
+		x2 = al2->forward_position;
+		y2 = al2->reverse_position > 0 ? al2->reverse_position : x1;
+	} else x2 = y2 = al2->reverse_position;
+	
+  if (x1 < x2) {
     a = -1;
-  } else if (al1->forward_position > al2->forward_position) {
+  } else if (x1 > x2) {
     a = 1;
-  } else if (al1->reverse_position < al2->reverse_position) {
+  } else if (y1 < y2) {
     a = -1;
-  } else if (al1->reverse_position > al2->reverse_position) {
+  } else if (y1 > y2) {
     a = 1;
   } else if (al1->bs_strand < al2->bs_strand) {
     a = -1;
@@ -1310,8 +1320,8 @@ void call_genotypes_ML(char *ctg, gt_vector *align_list, uint64_t x, uint64_t y,
   for (uint64_t ix = 0; ix < nr; ix++, al_p++) {
     align_details *al = *al_p;
     uint64_t x1 = al->forward_position;
-    if (al->reverse_position < x1)
-      x1 = al->reverse_position;
+		if(x1 == 0) x1 = al->reverse_position;
+    else if (al->reverse_position > 0 && al->reverse_position < x1) x1 = al->reverse_position;
     assert(x1 >= x);
     int ori = al->orientation;
     assert(ori < 2);
@@ -1320,6 +1330,7 @@ void call_genotypes_ML(char *ctg, gt_vector *align_list, uint64_t x, uint64_t y,
     for (int k = 0; k < 2; k++) {
 			if(!al->read[k]) continue;
       uint64_t rl = gt_string_get_length(al->read[k]);
+			if(rl == 0) continue;
 			// fprintf(stderr,"%d\t%lu\t%lu\n",k,k?al->reverse_position:al->forward_position,rl);
       float mapq = al->mapq[k];
       if (!rl)
@@ -1566,8 +1577,7 @@ void call_genotypes_GM(char *ctg, gt_vector *align_list, uint64_t x, uint64_t y,
     for (int k = 0; k < 2; k++) {
 			if(!al->read[k]) continue;
       uint64_t rl = gt_string_get_length(al->read[k]);
-      if (!rl)
-        continue;
+      if (rl == 0) continue;
       char *sp = gt_string_get_string(al->read[k]);
       char *sq = gt_string_get_string(al->qualities[k]);
       uint64_t pos = k ? al->reverse_position : al->forward_position;
@@ -1648,7 +1658,8 @@ gt_status process_template_vector(gt_vector *align_list, char *ctg, uint64_t y,
   // Best being the pair with the highest total quality score for all
   // non-trimmed bases
   x = (*al_p)->forward_position;
-  int j = 0, k = 0;
+	if(x == 0) x = (*al_p)->reverse_position;
+	int j = 0, k = 0;
   int curr_ct = 0;
   uint64_t x1 = 0;
   uint64_t x2 = 0;
@@ -1661,8 +1672,8 @@ gt_status process_template_vector(gt_vector *align_list, char *ctg, uint64_t y,
         *(align_details **)gt_vector_get_elm(align_list, i, align_details *);
     if (!(al->read[0] || al->read[1]))
       continue;
-    if (al->reverse_position < x)
-      x = (al->reverse_position);
+    if (al->reverse_position > 0 && al->reverse_position < x)
+      x = al->reverse_position;
     if (al->forward_position == x1 && al->reverse_position == x2 &&
         al->bs_strand == strand) {
 //			fprintf(stderr,"AA: %" PRIu64 ", %" PRIu64 " i = %d\n", al->forward_position, al->reverse_position, i);
@@ -1758,6 +1769,10 @@ gt_status process_template_vector(gt_vector *align_list, char *ctg, uint64_t y,
   gt_status gts = gt_sequence_archive_get_sequence_string(
       param->sequence_archive, ctg, FORWARD, x1 - 1, length, ref);
   if (gts) {
+		if(gts == GT_SEQUENCE_NOT_FOUND) {
+			fprintf(stderr,"Could not find reference sequence for contig '%s'\n", ctg);
+			return GT_STATUS_OK;
+		}
 		fprintf(stderr,"Ref problem - retrying\n");
     x1 = x;
     y1 = y;
@@ -1775,6 +1790,7 @@ gt_status process_template_vector(gt_vector *align_list, char *ctg, uint64_t y,
     for (int k = 0; k < 2; k++) {
 			if((*al_p)->read[k]==NULL) continue;
       uint64_t rl = gt_string_get_length((*al_p)->read[k]);
+			if(rl == 0) continue;
       uint64_t num_misms = gt_vector_get_used((*al_p)->mismatches[k]);
       // Trim Soft clips if present
       int nclip = 0;
@@ -1820,7 +1836,7 @@ gt_status process_template_vector(gt_vector *align_list, char *ctg, uint64_t y,
     if((*al_p)->read[1]) rdl[1]=gt_string_get_length((*al_p)->read[1]);
     bool rev;
     int64_t overlap;
-		if((*al_p)->read[0] && (*al_p)->read[1]) {
+		if(rdl[0] > 0 && rdl[1] > 0) {
 			if ((*al_p)->forward_position <= (*al_p)->reverse_position) {
 				overlap = (*al_p)->reference_span[0] - (*al_p)->reverse_position +
 					(*al_p)->forward_position;
@@ -1985,7 +2001,7 @@ gt_status process_template_vector(gt_vector *align_list, char *ctg, uint64_t y,
     // Here we simply normalize the reads w.r.t. indels by
     // adding N's in the place of deletions and removing insertions
     for (int k = 0; k < 2; k++) {
-			if(!rdl[k]) continue;
+			if(rdl[k] == 0) continue;
       uint64_t num_misms = gt_vector_get_used((*al_p)->mismatches[k]);
       if (num_misms) {
         uint64_t del_size = 0;
@@ -2078,6 +2094,7 @@ gt_status input_sam_parser_get_template_vector(
         return error_code;
       }
     }
+		fprintf(stderr,"And here\n");
     // Check file format
     if (gt_input_sam_parser_check_sam_file_format(buffered_sam_input)) {
       gt_error(PARSE_SAM_BAD_FILE_FORMAT,
@@ -2127,6 +2144,7 @@ gt_status input_sam_parser_get_template_vector(
     gt_input_sam_parser_next_record(buffered_sam_input);
     if (error_code) {
       if (error_code == GT_ISP_SAM_FILTERED) {
+				fprintf(stderr,"FILTERED!\n");
         continue;
       }
       gt_input_sam_parser_prompt_error(buffered_sam_input, line_num,
@@ -2134,6 +2152,7 @@ gt_status input_sam_parser_get_template_vector(
                                        error_code);
       return GT_ISP_FAIL;
     }
+		fprintf(stderr,"Read OK!\n");
     gt_input_parse_tag_chomp_pairend_info(tag);
     if (al->tag)
       free(al->tag);
@@ -2268,6 +2287,7 @@ gt_status input_sam_parser_get_template_vector(
     gt_input_sam_parser_next_record(buffered_sam_input);
     if (error_code) {
       if (error_code == GT_ISP_SAM_FILTERED) {
+//				fprintf(stderr,"A: FILTERED!\n");
         continue;
       }
       gt_input_sam_parser_prompt_error(buffered_sam_input, line_num,
@@ -2321,8 +2341,14 @@ gt_status input_sam_parser_get_template_vector(
 			insert = true;
 		}
 		if (new_block == false && insert == true) {
-			if (al->forward_position > max_pos && al->reverse_position > max_pos) {
-				new_block = true;
+			if(al->alignment_flag & GT_SAM_FLAG_MULTIPLE_SEGMENTS) {
+				if (al->forward_position > max_pos && al->reverse_position > max_pos) {
+					new_block = true;
+				}
+			} else {
+				if (al->forward_position > max_pos || al->reverse_position > max_pos) {
+					new_block = true;
+				}
 			}
 		}
     if (new_block == true) {
@@ -2354,46 +2380,58 @@ gt_status input_sam_parser_get_template_vector(
       max_pos = 0;
     }
     uint64_t x;
-    x = al->forward_position + llabs(al->template_len) - 1;
-    if (x > max_pos)
-      max_pos = x;
-    if (insert == false) {
-      align_details *thash;
-      HASH_FIND(hh, align_hash, al->tag, gt_string_get_length(tag), thash);
-      if (thash) {
-        gt_vector_reserve(align_list, thash->idx + 1, false);
-        if (gt_vector_get_used(align_list) <= thash->idx)
-          gt_vector_set_used(align_list, thash->idx + 1);
-        gt_vector_set_elm(align_list, thash->idx, align_details *, thash);
-        HASH_DEL(align_hash, thash);
-        int ix = reverse ? 1 : 0;
-        gt_string *ts = thash->read[ix];
-        thash->read[ix] = al->read[ix];
-        al->read[ix] = ts;
-        ts = thash->qualities[ix];
-        thash->qualities[ix] = al->qualities[ix];
-        al->qualities[ix] = ts;
-        thash->mapq[ix] = al->mapq[ix];
-        thash->reference_span[ix] = al->reference_span[ix];
-        gt_vector *tv = thash->mismatches[ix];
-        thash->mismatches[ix] = al->mismatches[ix];
-        al->mismatches[ix] = tv;
-      } else {
-        fprintf(stdout, "Warning not found: " PRIgts " %" PRIu64 " %" PRIu64 " %c\n",
-                PRIgts_content(tag), al->forward_position, al->reverse_position,
-                al->orientation == FORWARD ? '+' : '-');
-      }
-    } else {
-      // Here we have a forward facing pair, so we need to store end to be
-      // matched up later
-      al->idx = read_idx++; // Preserve read order after matching
-      align_details *thash;
-      HASH_FIND(hh, align_hash, al->tag, gt_string_get_length(tag), thash);
-      gt_cond_fatal_error(thash != NULL, PARSE_SAM_DUPLICATE_SEQUENCE_TAG,
-                          PRIgts_content(tag));
-      HASH_ADD_KEYPTR(hh, align_hash, al->tag, gt_string_get_length(tag), al);
-      al = 0;
-    }
+		if(al->alignment_flag & GT_SAM_FLAG_MULTIPLE_SEGMENTS) {
+			x = al->forward_position + llabs(al->template_len) - 1;
+			if (x > max_pos) max_pos = x;
+			if (insert == false) {
+				align_details *thash;
+				HASH_FIND(hh, align_hash, al->tag, gt_string_get_length(tag), thash);
+				if (thash) {
+					gt_vector_reserve(align_list, thash->idx + 1, false);
+					if (gt_vector_get_used(align_list) <= thash->idx)
+						gt_vector_set_used(align_list, thash->idx + 1);
+					gt_vector_set_elm(align_list, thash->idx, align_details *, thash);
+					HASH_DEL(align_hash, thash);
+					int ix = reverse ? 1 : 0;
+					gt_string *ts = thash->read[ix];
+					thash->read[ix] = al->read[ix];
+					al->read[ix] = ts;
+					ts = thash->qualities[ix];
+					thash->qualities[ix] = al->qualities[ix];
+					al->qualities[ix] = ts;
+					thash->mapq[ix] = al->mapq[ix];
+					thash->reference_span[ix] = al->reference_span[ix];
+					gt_vector *tv = thash->mismatches[ix];
+					thash->mismatches[ix] = al->mismatches[ix];
+					al->mismatches[ix] = tv;
+				} else {
+					fprintf(stdout, "Warning not found: " PRIgts " %" PRIu64 " %" PRIu64 " %c\n",
+									PRIgts_content(tag), al->forward_position, al->reverse_position,
+									al->orientation == FORWARD ? '+' : '-');
+				}
+			} else {
+				// Here we have a forward facing pair, so we need to store end to be
+				// matched up later
+				al->idx = read_idx++; // Preserve read order after matching
+				align_details *thash;
+				HASH_FIND(hh, align_hash, al->tag, gt_string_get_length(tag), thash);
+				gt_cond_fatal_error(thash != NULL, PARSE_SAM_DUPLICATE_SEQUENCE_TAG,
+														PRIgts_content(tag));
+				HASH_ADD_KEYPTR(hh, align_hash, al->tag, gt_string_get_length(tag), al);
+				al = 0;
+			}
+		} else { // Single (non-paired) reads
+			if(al->forward_position > 0) x = al->forward_position + al->align_length;
+			else x = al->reverse_position + al->align_length;
+//			fprintf(stderr,"%lu %lu %lu %lu %lu\n", al->forward_position, al->reverse_position, al->align_length, x, max_pos);
+			if(x > max_pos) max_pos = x;
+			al->idx = read_idx++; // Preserve read order after matching
+			gt_vector_reserve(align_list, al->idx + 1, false);
+			if (gt_vector_get_used(align_list) <= al->idx)
+				gt_vector_set_used(align_list, al->idx + 1);
+			gt_vector_set_elm(align_list, al->idx, align_details *, al);
+			al = 0;
+		}
   } while (1);
   return GT_ISP_OK;
 }
@@ -2534,6 +2572,11 @@ gt_status bs_call_process(sr_param *param) {
 
   fill_base_prob_table(param->under_conv, param->over_conv);
 
+    gt_vector *templates = gt_vector_new(32, sizeof(gt_template *));
+    error_code = input_sam_parser_get_template_vector(
+        buffered_input, templates, input_sam_attributes, param);
+
+#if 0
   if (param->is_paired) {
     gt_vector *templates = gt_vector_new(32, sizeof(gt_template *));
     error_code = input_sam_parser_get_template_vector(
@@ -2547,6 +2590,7 @@ gt_status bs_call_process(sr_param *param) {
         break;
     }
   }
+#endif
   gt_input_sam_parser_attributes_delete(input_sam_attributes);
   gt_buffered_input_file_close(buffered_input);
   gt_input_file_close(input_file);
