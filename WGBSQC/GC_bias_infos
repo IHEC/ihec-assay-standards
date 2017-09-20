@@ -1,0 +1,7 @@
+# GC bias computation:
+Pearson correlation between coverage values and GC content
+# GC resource file
+One million bins of 100 base pair (bins randomly distributed on the genome). 
+Four columns: chr \t start \t end \t GC
+# Hg38 GC resource file is available at: 
+http://www.epigenomes.ca/data/CEMT/resources/hg38.gc.1M
