@@ -1,4 +1,13 @@
 ihec-assay-standards
 ====================
 
-This repo is for code and documentation associated with the ihec-assay-standards working group
+This repository is for code and documentation associated with the IHEC Assay Standards working group.
+
+#### QC Metrics (/qc_metrics)
+
+The documentation and code to compute metrics for all core assays are located [here](/qc_metrics).
+
+
+#### Pipelines (/pipelines)
+
+Documentation on the ongoing effort to create uniform pipelines across all data producing centres is available [here](/pipelines).
