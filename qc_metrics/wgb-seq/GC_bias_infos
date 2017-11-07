@@ -1,5 +1,5 @@
 # GC bias computation:
-Pearson correlation between coverage values and GC content
+Spearman correlation between coverage values and GC content
 # GC resource file
 One million bins of 100 base pair (bins randomly distributed on the genome). 
 Four columns: chr \t start \t end \t GC
