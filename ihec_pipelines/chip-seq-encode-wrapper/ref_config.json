@@ -1,0 +1,8 @@
+{
+    "blacklist": "./hg38_resources/genome_hg38/hg38.blacklist.bed.gz",
+    "bowtie2_idx_tar": "/dev/null",
+    "bwa_idx_tar": "./hg38_resources/genome_hg38/bwa_index/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta.tar",
+    "chrsz": "./hg38_resources/genome_hg38/hg38.chrom.sizes",
+    "gensz": "hs",
+    "ref_fa": "./hg38_resources/genome_hg38/GRCh38_no_alt_analysis_set_GCA_000001405.15.fasta"
+}

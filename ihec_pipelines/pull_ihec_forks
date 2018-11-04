@@ -1,0 +1,18 @@
+#!/bin/bash
+
+
+
+if [[ ${1:-"https"} == "ssh" ]]; then 
+  echo "ssh"
+  git clone git@github.com:IHEC/grape-nf.git
+  git clone --recursive git@github.com:IHEC/gemBS.git 
+else
+  git clone --recursive https://github.com/IHEC/gemBS.git
+  git clone https://github.com/IHEC/grape-nf.git
+fi
+
+
+
+
+
+
