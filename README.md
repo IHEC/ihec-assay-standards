@@ -1,7 +1,7 @@
 ihec-assay-standards
 ====================
 
-This repository is for code and documentation associated with the IHEC Assay Standards working group.
+This repository is for code and documentation associated with the IHEC Assay Standards working group. `--recursive` option will be required when cloning to resolve submodules.
 
 #### QC Metrics (/qc_metrics)
 
