@@ -14,4 +14,4 @@ Documentation on the ongoing effort to create uniform pipelines across all data 
 
 #### Pipeline Code
 
-All pipeline code is available under ihec-pipelines-dev branch of this repository [here](https://github.com/IHEC/ihec-assay-standards/tree/ihec-pipelines-dev) while under development.  
+All pipeline code is available under [ihec-pipelines-dev branch of this repository](https://github.com/IHEC/ihec-assay-standards/tree/ihec-pipelines-dev) while under development.  
