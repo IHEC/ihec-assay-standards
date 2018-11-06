@@ -1,0 +1,6 @@
+[submodule "pipelines/RNA-Seq"]
+	path = pipelines/RNA-Seq
+	url = https://github.com/IHEC/grape-nf
+[submodule "pipelines/Bisulfite-Seq"]
+	path = pipelines/Bisulfite-Seq
+	url = https://github.com/IHEC/gemBS

@@ -10,12 +10,12 @@ The documentation and code to compute metrics for all core assays are located [h
 
 #### Pipelines Documentation (/pipelines)
 
-Documentation on the ongoing effort to create uniform pipelines across all data producing centres is available [here](/pipelines).
+Documentation on the ongoing effort to create uniform pipelines across all data producing centres is available [here](/pipelines/documetation).
 
 
 #### Pipelines
 
-All code for IHEC standard pipelines available [here](/ihec_pipelines).
+All code for IHEC standard pipelines available [here](/pipelines).
 
 
 
