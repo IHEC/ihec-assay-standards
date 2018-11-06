@@ -1,6 +1,0 @@
-[submodule "pipelines/wgb-seq/gem3-mapper"]
-	path = pipelines/wgb-seq/gem3-mapper
-	url = https://github.com/heathsc/gem3-mapper.git
-[submodule "pipelines/wgb-seq/bs_call"]
-	path = pipelines/wgb-seq/bs_call
-	url = https://github.com/heathsc/bs_call.git
