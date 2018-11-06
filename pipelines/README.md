@@ -5,7 +5,7 @@ This directory contains code for IHEC integrative analysis. Please see individua
 
 #### Bisulfite-Seq (/Bisulfite-Seq)
 
-This code is fork of https://github.com/heathsc/gemBS  
+This code is from https://github.com/heathsc/gemBS  
 
 #### ChIP-Seq (/ChIP-Seq)
 
@@ -13,7 +13,7 @@ This code wraps ENCODE ChIP-Seq v2 pipeline: https://github.com/ENCODE-DCC/chip-
 
 #### RNA-Seq (/RNA-Seq)
 
-This code is fork of https://github.com/IHEC/grape-nf
+This code is from https://github.com/IHEC/grape-nf
 
 
 
