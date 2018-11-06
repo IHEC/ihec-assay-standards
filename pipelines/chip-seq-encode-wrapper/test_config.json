@@ -1,0 +1,26 @@
+{
+    "data": {
+        "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.fastq.gz": [
+            "http://www.epigenomes.ca/data/CEMT/raw/62907c3ce6566527cc12/MCF10A/ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.fastq.gz"
+        ],
+        "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.2.fastq.gz": [
+            "http://www.epigenomes.ca/data/CEMT/raw/62907c3ce6566527cc12/MCF10A/ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.2.fastq.gz"
+        ],
+        "ChIP-Seq.IX1239-A28471-ATCACG.134224.D2B0LACXX.2.1.fastq.gz": [
+            "http://www.epigenomes.ca/data/CEMT/raw/62907c3ce6566527cc12/MCF10A/ChIP-Seq.IX1239-A28471-ATCACG.134224.D2B0LACXX.2.1.fastq.gz"
+        ],
+        "ChIP-Seq.IX1239-A28471-ATCACG.134224.D2B0LACXX.2.2.fastq.gz": [
+            "http://www.epigenomes.ca/data/CEMT/raw/62907c3ce6566527cc12/MCF10A/ChIP-Seq.IX1239-A28471-ATCACG.134224.D2B0LACXX.2.2.fastq.gz"
+        ],
+		"ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.1.fastq.gz" : [
+			"http://www.epigenomes.ca/data/CEMT/raw/62907c3ce6566527cc12/MCF10A/ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.1.fastq.gz"
+		],
+		"ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.2.fastq.gz" : [
+			"http://www.epigenomes.ca/data/CEMT/raw/62907c3ce6566527cc12/MCF10A/ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.2.fastq.gz"
+		]
+
+
+
+    },
+    "pipeline": "ChIP-Seq"
+}
