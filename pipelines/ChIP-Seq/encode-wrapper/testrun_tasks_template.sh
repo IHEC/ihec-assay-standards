@@ -13,8 +13,7 @@ echo $PATH
 CROMWELL_HOME="{home}"
 BACKEND_CONF="{backend}"
 WORKFLOW_OPT="{container}"
-BACKEND="Local"
-
+BACKEND="{backend_default}"
 
 WDL="$1"
 

@@ -127,19 +127,21 @@ def make_tests():
 		print 'written:', fix(f, base)
 
 def write_testrun(config):
+	
 	with open('testrun_template.sh') as infile:
-		logerr(dumpf('{0}/testrun.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
+		logerr(dumpf('{0}/piperunner.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	with open('testrun_tasks_template.sh') as infile:
 		logerr(dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	
-	logerrn(dumpf('./singularity_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/encode_test_tasks_run.sh\n\n'.format(**config)))
-	return dumpf('./singularity_test.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity exec {container_image} {home}/testrun.sh $1\n\n'.format(**config))
+	logerrn(dumpf('./singularity_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity {-B} exec {container_image} {home}/encode_test_tasks_run.sh $1\n\n'.format(**config)))
+	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity {-B} exec {container_image} {home}/piperunner.sh $1 $2\n\n'.format(**config))
 
 
 
 def singularity_pull_image(home, config, debug=debug_mode):
 	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
 	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1'
+	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1.1a'
 	os.chdir('./images')
 	if debug:
 		dumpf('./debug.img', 'test:{0}'.format('singularity'))
@@ -169,6 +171,7 @@ def singularity_pull_image(home, config, debug=debug_mode):
 	return {
 		"container_image":image_path,
 		"home" : home,
+		"backend_default" : '${2:-"Local"}',
 		"container" :  os.path.abspath(container),
 		"wdl" : "{0}/v2/chip.wdl".format(home),
 		"backend" : "{0}/backend.conf".format(home)
@@ -196,7 +199,12 @@ def main(args):
 		get_test_data('./test_config.json', home)
 	
 	if '-pullimage' in args:
+		params = [e for e in args if not e[0] == '-']
 		container_config = singularity_pull_image(home, args, debug = False)
+		container_config['-B'] = ''
+		bind =  ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
+		if len(params) > 0:
+			container_config['-B'] = '-B {0}'.format(bind)
 		container = write_testrun(container_config)
 		logerr('# container: {0}\n'.format(container))
 	
