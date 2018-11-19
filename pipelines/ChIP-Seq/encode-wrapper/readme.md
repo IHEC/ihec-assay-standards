@@ -21,7 +21,7 @@ Then run `python chip.py -pullimage` . This will write:
 
 * singularity_test.sh
 
-Using `./chip.py -pullimage $PWD/data_b $PWD/data_a` will mount `$PWD/data_b` as `/mnt/ext_0`, `$PWD/data_a` as `/mnt/ext_1` and so on. 
+Using `./chip.py -pullimage $PWD/data_b $PWD/data_a` will mount `$PWD/data_b` as `/mnt/ext_1`, `$PWD/data_a` as `/mnt/ext_2` and so on. It binds `$PWD` to `/mnt/ext_0`.  
 
 As well as creating the singularity image in `./images` .
 

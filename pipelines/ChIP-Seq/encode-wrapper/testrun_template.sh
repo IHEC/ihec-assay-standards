@@ -11,7 +11,7 @@ echo $PATH
 
 BACKEND_CONF="{backend}"
 WORKFLOW_OPT="{container}"
-BACKEND="{backend_default}"
+BACKEND=$2 #"{backend_default}"
 CHIP="{wdl}"
 
 jobFile=$1 
