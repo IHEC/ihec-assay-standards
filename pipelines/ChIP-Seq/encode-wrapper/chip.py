@@ -164,8 +164,8 @@ def singularity_pull_image(home, config, debug=debug_mode):
 		}
 	})
 		
-	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
-	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./'.format(image_path), assert_ok=True)
+	shell('singularity exec -B $PWD {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
+	shell('singularity exec -B $PWD {0} cp /software/chip-seq-pipeline/chip.wdl ./'.format(image_path), assert_ok=True)
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl\n')
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./chip.wdl\n')
 	home_mnt = "/mnt/ext_0" if '-centos6' in config else home

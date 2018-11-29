@@ -48,6 +48,7 @@ def shell(cmd, assert_ok=False):
 	for line in p.stdout: #.readlines():
 		logerr(line)
 	exit = p.wait()
+	logerrn('#exit:{1} {0}'.format(cmd,exit))
 	if assert_ok:
 		assert exit == 0
 	return exit == 0
