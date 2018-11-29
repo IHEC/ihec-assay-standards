@@ -132,7 +132,7 @@ def write_testrun(config):
 	with open('testrun_tasks_template.sh') as infile:
 		logerr('#written:' +  dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	
-	logerrn('#written:' + dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/encode_test_tasks_run.sh {home_mnt} "${{1:-Local}}"\n\n'.format(**config)))
+	logerrn('#written:' + dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/encode_test_tasks_run.sh {home_mnt} "${{1:-Local}}" $@\n\n'.format(**config)))
 	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\n\nBACKEND="{backend_default}"\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/piperunner.sh {home_mnt} $1 $BACKEND\n\n'.format(**config))
 
 
@@ -163,12 +163,13 @@ def singularity_pull_image(home, config, debug=debug_mode):
 			"singularity_instance_name": image_label
 		}
 	})
-	container_mnt = '/mnt/ext_0/v2/singularity_container.json'
 		
 	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
 	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./'.format(image_path), assert_ok=True)
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl\n')
+	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./chip.wdl\n')
 	home_mnt = "/mnt/ext_0" if '-centos6' in config else home
+	container_mnt = '{0}/v2/singularity_container.json'.format(home_mnt)
 	return {
 		"container_image":image_path,
 		"home" : home,
@@ -183,8 +184,11 @@ def singularity_pull_image(home, config, debug=debug_mode):
 
 def bindargs(args):
 	binds = ''
-	if not '-centos6' in args:
+	if not '-centos6' in args and not '-bindpwd' in args:
 		return binds
+	if '-bindpwd' in args:
+		return '-B ' + os.getcwd()
+	
 	params = [os.getcwd()] + [e for e in args if not e[0] == '-']
 	additional = ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
 	if len(params) > 0:
