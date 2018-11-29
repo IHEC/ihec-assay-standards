@@ -23,10 +23,11 @@ def wget(url, debug=debug_mode):
 		logerr(' ..debug: wget {0}\n'.format(url))
 		dumpf(os.path.basename(url), 'test:{0}'.format(url))
 		return
-	p = subprocess.Popen('wget ' + url ,shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	#p = subprocess.Popen('wget ' + url ,shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	#p = subprocess.Popen(['wget', url, '--directory-prefix', './test_data'] ,shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	for line in p.stdout.readlines():
-		logerr(line)
+	#for line in p.stdout.readlines():
+	#	logerr(line)
+	p = subprocess.Popen('wget ' + url ,shell=True)
 	return p.wait()
 	
 	
@@ -132,7 +133,7 @@ def write_testrun(config):
 	with open('testrun_tasks_template.sh') as infile:
 		logerr('#written:' +  dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	
-	logerrn('#written:' + dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/encode_test_tasks_run.sh {home_mnt} "${{1:-Local}}" $@\n\n'.format(**config)))
+	logerrn('#written:' + dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/encode_test_tasks_run.sh {home_mnt} "${{1:-Local}}" ${{@:2}}\n\n'.format(**config)))
 	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\n\nBACKEND="{backend_default}"\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/piperunner.sh {home_mnt} $1 $BACKEND\n\n'.format(**config))
 
 
@@ -149,10 +150,11 @@ def singularity_pull_image(home, config, debug=debug_mode):
 		if not '-nobuild' in config:
 			shell(cmd, assert_ok = True)
 	
-	images = glob.glob('./*img')
-	assert len(images) == 1
+	images = glob.glob('./*img') + glob.glob('./*.sif')
+	assert len(images) == 1, images
 	image_label = 'chip_seq_pipeline_{0}'.format(image_version)
-	image_name = '{0}.simg'.format(image_label)
+	image_ext = images[0].split('.')[-1]
+	image_name = '{0}.{1}'.format(image_label, image_ext)
 	logerr('# pulled image: {0}, moved: {1}\n'.format(images[0], image_name))
 	os.rename(images[0], image_name)
 	image_path = os.path.abspath(image_name)
@@ -187,8 +189,13 @@ def bindargs(args):
 	if not '-centos6' in args and not '-bindpwd' in args:
 		return binds
 	if '-bindpwd' in args:
-		return '-B ' + os.getcwd()
-	
+		params = [e for e in args if not e[0] == '-']
+		bindpwd = '-B ' + os.getcwd() 
+		if not params:
+			return bindpwd
+		else:
+			return bindpwd + ',' + ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
+
 	params = [os.getcwd()] + [e for e in args if not e[0] == '-']
 	additional = ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
 	if len(params) > 0:

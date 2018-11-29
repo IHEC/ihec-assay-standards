@@ -11,21 +11,27 @@ First run `./get_encode_resources.sh` to get encode test dataset and hg38 genome
 
 By default it will use git over http. If you want to use ssh, then pass `ssh` as first argumnet
 
-Then run `python chip.py -pullimage` . This will write:
+Then run `python chip.py -pullimage -bindpwd` . Bind pwd will mount the current directory (equivalent to arguments `-B $PWD`). 
 
-* testrun.sh
+This will write:
+
+* piperunner.sh
 
 * testrun_tasks.sh
 
-* singularity_test_tasks.sh
+* singularity_encode_test_tasks.sh
 
-* singularity_test.sh
+* singularity_wrapper.sh
 
-Using `./chip.py -pullimage $PWD/data_b $PWD/data_a` will mount `$PWD/data_b` as `/mnt/ext_1`, `$PWD/data_a` as `/mnt/ext_2` and so on. It binds `$PWD` to `/mnt/ext_0`.  
+If you are running in `Local` mode using using `./chip.py -pullimage -bindpwd $PWD/data_b $PWD/data_a` will mount `$PWD/data_b` as `/mnt/ext_1`, `$PWD/data_a` as `/mnt/ext_2` and so on. It binds `$PWD` to `/mnt/ext_0`.  
 
-As well as creating the singularity image in `./images` .
+If you are running in `sge_singularity` or `singularity`, binding local paths to container paths where they are not both the same will not work. If this use case is unavoidable, then refer to ENCODE documentation on how to use the pipeline. This IHEC wrapper does not support this.  
+
+This will also create the singularity image in `./images` .
 
 Do `chmod +x ./*sh`
+
+You can pass `-nobuild` if you hust want to regenerate the wrapper scripts without pulling the singularity image again. 
 
 Check singularity version with `singularity --version` to make sure it's at least `2.5.2` .
 
@@ -41,8 +47,7 @@ Doing `python chip.py  -maketests` will write ChIP test configurations:
 
 IHEC tests can be run with:
 
-`./singularity_test.sh ./v2/ihec/cemt0007_h3k4me3.json` and `./singularity_test.sh ./v2/ihec/cemt0007_h3k27me3.json` 
-
+`./singularity_wrapper.sh ./v2/ihec/cemt0007_h3k4me3.json` and `./singularity_test.sh ./v2/ihec/cemt0007_h3k27me3.json` 
 
 The provided configuration files are for 75bp PET only. Standard configration files for SET and read lengths will be provided. Currently the only local mode is supported for singularity. Slurm support is on the way. The ENCODE documentation addresses both. 
 
