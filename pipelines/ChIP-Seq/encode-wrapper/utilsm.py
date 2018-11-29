@@ -44,7 +44,7 @@ def logerrn(m):
 
 
 def shell(cmd, assert_ok=False):
-	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.PIPE)
 	for line in p.stdout: #.readlines():
 		logerr(line)
 	exit = p.wait()

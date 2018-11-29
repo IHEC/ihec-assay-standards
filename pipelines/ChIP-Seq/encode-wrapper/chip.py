@@ -127,21 +127,19 @@ def make_tests():
 		print 'written:', fix(f, base)
 
 def write_testrun(config):
-	
 	with open('testrun_template.sh') as infile:
-		logerr(dumpf('{0}/piperunner.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
+		logerr('#written:' + dumpf('{0}/piperunner.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	with open('testrun_tasks_template.sh') as infile:
-		logerr(dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
+		logerr('#written:' +  dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	
-	logerrn(dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec -B $PWD:/mnt/ext_0 {container_image} /mnt/ext_0/encode_test_tasks_run.sh /mnt/ext_0 "${{1:-Local}}"\n\n'.format(**config)))
-	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\n\nBACKEND="{backend_default}"\n\nsingularity exec -B {additional_binds} {container_image} {home_mnt}/piperunner.sh /mnt/ext_0 $1 $BACKEND\n\n'.format(**config))
+	logerrn('#written:' + dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/encode_test_tasks_run.sh {home_mnt} "${{1:-Local}}"\n\n'.format(**config)))
+	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\n\nBACKEND="{backend_default}"\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/piperunner.sh {home_mnt} $1 $BACKEND\n\n'.format(**config))
 
 
 
 def singularity_pull_image(home, config, debug=debug_mode):
-	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
-	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1'
-	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1.1a'
+	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1.2'
+	image_version = imageurl.split(':')[-1].replace('.', '_')
 	os.chdir('./images')
 	if debug:
 		dumpf('./debug.img', 'test:{0}'.format('singularity'))
@@ -153,7 +151,7 @@ def singularity_pull_image(home, config, debug=debug_mode):
 	
 	images = glob.glob('./*img')
 	assert len(images) == 1
-	image_label = 'chip_seq_pipeline_v_1_1'
+	image_label = 'chip_seq_pipeline_{0}'.format(image_version)
 	image_name = '{0}.simg'.format(image_label)
 	logerr('# pulled image: {0}, moved: {1}\n'.format(images[0], image_name))
 	os.rename(images[0], image_name)
@@ -168,8 +166,9 @@ def singularity_pull_image(home, config, debug=debug_mode):
 	container_mnt = '/mnt/ext_0/v2/singularity_container.json'
 		
 	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
+	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./'.format(image_path), assert_ok=True)
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl\n')
-	home_mnt = "/mnt/ext_0"
+	home_mnt = "/mnt/ext_0" if '-centos6' in config else home
 	return {
 		"container_image":image_path,
 		"home" : home,
@@ -180,6 +179,18 @@ def singularity_pull_image(home, config, debug=debug_mode):
 		"wdl" : "{0}/v2/chip.wdl".format(home_mnt),
 		"backend" : "{0}/backend.conf".format(home_mnt)
 	}
+
+
+def bindargs(args):
+	binds = ''
+	if not '-centos6' in args:
+		return binds
+	params = [os.getcwd()] + [e for e in args if not e[0] == '-']
+	additional = ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
+	if len(params) > 0:
+		binds = additional
+	return '-B ' + binds
+
 def main(args):
 	home = base()
 	logerr('# prefix {0}\n'.format(home))
@@ -205,10 +216,7 @@ def main(args):
 	if '-pullimage' in args:
 		params = [os.getcwd()] + [e for e in args if not e[0] == '-']
 		container_config = singularity_pull_image(home, args, debug = False)
-		container_config['additional_binds'] = ''
-		additional_binds = ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
-		if len(params) > 0:
-			container_config['additional_binds'] = additional_binds
+		container_config['additional_binds'] = bindargs(args)
 		container = write_testrun(container_config)
 		logerr('# container: {0}\n'.format(container))
 	
