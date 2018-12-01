@@ -35,7 +35,7 @@ You can pass `-nobuild` if you hust want to regenerate the wrapper scripts witho
 
 Check singularity version with `singularity --version` to make sure it's at least `2.5.2` .
 
-To run ENCODE test tasks, do `./singularity_test_tasks.sh Local` . The output of tests will be written in ` test_tasks_results` . Make sure all test pass, by looking through jsons generated. 
+To run ENCODE test tasks, do `singularity_encode_test_tasks.sh Local try1` . The output of tests will be written in `test_tasks_results_try1` . Make sure all test pass, by looking through jsons generated. The first argument is the confi argument to cromwell (see ENCODE pipeline documentation). Only Local is currently supported.
 
 Run `chip.py -get` to get IHEC ChIP test data for MCF10A cell line. 
 

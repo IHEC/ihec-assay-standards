@@ -109,14 +109,14 @@ def get_test_data(configfile, home):
 
 
 
-def make_tests():
+def make_tests(args):
 	mcf10a = ['cemt0007_h3k4me3_template.json', 'cemt0007_h3k27me3_template.json'] 
 	
 	if os.path.isfile('./hg38_resources/base_config.json'):
 		config = jloadf('./hg38_resources/base_config.json')
 		base = config['base']
 	else:
-		base = os.path.abspath(os.getcwd())
+		base = '/mnt/ext_0' if '-pwd2ext0' in args else  os.path.abspath(os.getcwd())
 
 	def fix(fname, base):
 		assert fname.endswith('_template.json')
@@ -138,7 +138,7 @@ def write_testrun(config):
 
 
 
-def singularity_pull_image(home, config, debug=debug_mode):
+def singularity_pull_image(home, config, binds, debug=debug_mode):
 	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1.2'
 	image_version = imageurl.split(':')[-1].replace('.', '_')
 	os.chdir('./images')
@@ -159,20 +159,23 @@ def singularity_pull_image(home, config, debug=debug_mode):
 	os.rename(images[0], image_name)
 	image_path = os.path.abspath(image_name)
 	os.chdir(home)
+	home_mnt = "/mnt/ext_0" if '-pwd2ext0' in config else home
+	container_mnt = '{0}/v2/singularity_container.json'.format(home_mnt)
 	container = jdumpf('./v2/singularity_container.json',  {
 		"default_runtime_attributes" : {
-			"singularity_container" : image_path,
+			"singularity_container" : '{0}/images/{1}'.format(home_mnt, image_name) ,
 			"singularity_instance_name": image_label
 		}
 	})
 		
-	shell('singularity exec -B $PWD {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
-	shell('singularity exec -B $PWD {0} cp /software/chip-seq-pipeline/chip.wdl ./'.format(image_path), assert_ok=True)
+	shell('singularity exec {1} {0} cp /software/chip-seq-pipeline/chip.wdl {2}/v2/'.format(image_path, binds, home_mnt), assert_ok=True)
+	shell('singularity exec {1} {0} cp /software/chip-seq-pipeline/chip.wdl {2}/'.format(image_path, binds, home_mnt), assert_ok=True)
+	if not os.path.exists('./chip.wdl') or not os.path.exists('./v2/chip.wdl'):
+		raise Exception('__couldNotCopy__:chip.wdl likey current directory is not bound in the container... ' + binds)
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl\n')
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./chip.wdl\n')
-	home_mnt = "/mnt/ext_0" if '-centos6' in config else home
-	container_mnt = '{0}/v2/singularity_container.json'.format(home_mnt)
 	return {
+		'additional_binds' : binds,
 		"container_image":image_path,
 		"home" : home,
 		"home_mnt": home_mnt,
@@ -186,21 +189,22 @@ def singularity_pull_image(home, config, debug=debug_mode):
 
 def bindargs(args):
 	binds = ''
-	if not '-centos6' in args and not '-bindpwd' in args:
+	if not '-bindpwd' in args:
 		return binds
 	if '-bindpwd' in args:
 		params = [e for e in args if not e[0] == '-']
-		bindpwd = '-B ' + os.getcwd() 
+		if '-pwd2ext0'in args:
+			bindpwd = '-B {0}:/mnt/ext_0'.format(os.getcwd())
+			offset = 1
+		else:
+			bindpwd = '-B ' + os.getcwd()
+			offset = 0
+
 		if not params:
 			return bindpwd
 		else:
-			return bindpwd + ',' + ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
-
-	params = [os.getcwd()] + [e for e in args if not e[0] == '-']
-	additional = ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
-	if len(params) > 0:
-		binds = additional
-	return '-B ' + binds
+			return bindpwd + ',' + ','.join([ '{1}:/mnt/ext_{0}'.format(i + offset, e) for i,e in enumerate(params)])
+	return binds
 
 def main(args):
 	home = base()
@@ -226,13 +230,13 @@ def main(args):
 	
 	if '-pullimage' in args:
 		params = [os.getcwd()] + [e for e in args if not e[0] == '-']
-		container_config = singularity_pull_image(home, args, debug = False)
-		container_config['additional_binds'] = bindargs(args)
+		binds = bindargs(args)
+		container_config = singularity_pull_image(home, args, binds, debug = False)
 		container = write_testrun(container_config)
 		logerr('# container: {0}\n'.format(container))
 	
 	if '-maketests' in args:
-		make_tests()
+		make_tests(args)
 	
 	
 	logerrn("__finished__")	
