@@ -1,0 +1,50 @@
+{
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr1_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.gz": [
+        "018ad8f5f3158534320ed359563878d3"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr1_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.hammock.gz": [
+        "defd886ab7923b952e04ee033a722fac"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr1_x_ctl_for_rep1.pval0.01.500K.narrowPeak.gz": [
+        "b1ae4fb3f2b68b3c8346c57fa04f476f"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr2_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.gz": [
+        "0f38658b68706ec12b5faded1141750e"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr2_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.hammock.gz": [
+        "b1ac6ab70d053b546f186080639252ed"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr2_x_ctl_for_rep1.pval0.01.500K.narrowPeak.gz": [
+        "1c9554fe8b67e61fd7c69a1881ec2e3a"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.gz": [
+        "55de2037c6657d1027fb6b625822fa8b"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.hammock.gz": [
+        "bf5cd1f743325a0161d4ab77b00af829"
+    ],
+    "ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup_x_ctl_for_rep1.pval0.01.500K.narrowPeak.gz": [
+        "7a52f55148b47e2a48fac330e3672c96"
+    ],
+    "conservative_peak.narrowPeak.gz": [
+        "49fdef6c06796ab06e8ac2a1b88075d1"
+    ],
+    "conservative_peak.narrowPeak.hammock.gz": [
+        "b78724bb667cc7bbfece8a587c10c915"
+    ],
+    "optimal_peak.narrowPeak.gz": [
+        "49fdef6c06796ab06e8ac2a1b88075d1"
+    ],
+    "optimal_peak.narrowPeak.hammock.gz": [
+        "b78724bb667cc7bbfece8a587c10c915"
+    ],
+    "rep1-pr.overlap.bfilt.narrowPeak.gz": [
+        "49fdef6c06796ab06e8ac2a1b88075d1"
+    ],
+    "rep1-pr.overlap.bfilt.narrowPeak.hammock.gz": [
+        "b78724bb667cc7bbfece8a587c10c915"
+    ],
+    "rep1-pr.overlap.narrowPeak.gz": [
+        "a896c1ec4693ddbd2e098ffa901c1f2a"
+    ]
+}
