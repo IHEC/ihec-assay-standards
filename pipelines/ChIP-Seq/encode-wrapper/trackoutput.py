@@ -23,7 +23,13 @@ def byino(fs):
 	return hashed2
 
 def md5script(hashed):
-	return ['echo "{1} $(md5sum {0})"'.format(v, os.path.basename(v)) for v in sorted(hashed.values(), key= lambda x: os.path.basename(x))]
+	def cmd(f):
+		if f.strip().endswith('bam'):
+			return 'echo "{1} $(./headlessbam_md5 {0})"'.format(f, os.path.basename(f))
+		else:
+			return 'echo "{1} $(md5sum {0})"'.format(f, os.path.basename(f))
+			
+	return [cmd(v) for v in sorted(hashed.values(), key= lambda x: os.path.basename(x))]
 
 def trackoutput(base, i):
 	logerr('# looking in {0}\n'.format(base))
