@@ -15,7 +15,7 @@ def main(args):
 	for log in logs:
 		data = jloadf(log)
 		if not check(data):
-			print '# failed: ' + log
+			print '# failed: ' + log, data['match_overall'], data["failed_task_labels"]
 		else:
 			print '# ok:' + log
 			n_ok +=1
