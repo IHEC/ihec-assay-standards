@@ -59,3 +59,20 @@ def mkdirs(path):
 	
 def movefile(s, d):
 	shutil.move(s, d)
+
+
+
+
+def by_keyvalue(alist, k, v):
+	hashed = dict()
+	for e in alist:
+		ke = k(e)
+		ve = v(e)
+		if not ke in hashed:
+			hashed[ke] = list()
+		hashed[ke].append(ve)
+	return hashed
+
+
+
+

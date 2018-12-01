@@ -3,20 +3,20 @@
     "chip.ctl_fastqs": [
         [
             [
-                "/mnt/ext_0/test_data/ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.1.fastq.gz", 
-                "/mnt/ext_0/test_data/ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.2.fastq.gz"
+                "/mnt/ext_1/test_data/ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.1.fastq.gz", 
+                "/mnt/ext_1/test_data/ChIP-Seq.IX1239-A26691-TCATTC.134224.D2B0LACXX.2.2.fastq.gz"
             ]
         ]
     ], 
     "chip.fastqs": [
         [
             [
-                "/mnt/ext_0/test_data/ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.fastq.gz", 
-                "/mnt/ext_0/test_data/ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.2.fastq.gz"
+                "/mnt/ext_1/test_data/ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.fastq.gz", 
+                "/mnt/ext_1/test_data/ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.2.fastq.gz"
             ]
         ]
     ], 
-    "chip.genome_tsv": "test_genome_database/hg38_local.tsv", 
+    "chip.genome_tsv": "/mnt/ext_0/test_genome_database/hg38_local.tsv", 
     "chip.paired_end": true, 
     "chip.pipeline_type": "histone", 
     "chip.qc_report.desc": "CEMT0007_MCF10A H3K27me3", 
