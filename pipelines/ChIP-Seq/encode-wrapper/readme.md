@@ -35,7 +35,7 @@ You can pass `-nobuild` if you hust want to regenerate the wrapper scripts witho
 
 Check singularity version with `singularity --version` to make sure it's at least `2.5.2` .
 
-To run ENCODE test tasks, do `./singularity_test_tasks.sh` . The output of tests will be written in ` test_tasks_results` . Make sure all test pass, by looking through jsons generated. 
+To run ENCODE test tasks, do `./singularity_test_tasks.sh Local` . The output of tests will be written in ` test_tasks_results` . Make sure all test pass, by looking through jsons generated. 
 
 Run `chip.py -get` to get IHEC ChIP test data for MCF10A cell line. 
 
@@ -47,7 +47,7 @@ Doing `python chip.py  -maketests` will write ChIP test configurations:
 
 IHEC tests can be run with:
 
-`./singularity_wrapper.sh ./v2/ihec/cemt0007_h3k4me3.json` and `./singularity_test.sh ./v2/ihec/cemt0007_h3k27me3.json` 
+`./singularity_wrapper.sh ./v2/ihec/cemt0007_h3k4me3.json` and `./singularity_wrapper.sh ./v2/ihec/cemt0007_h3k27me3.json` 
 
 The provided configuration files are for 75bp PET only. Standard configration files for SET and read lengths will be provided. Currently the only local mode is supported for singularity. Slurm support is on the way. The ENCODE documentation addresses both. 
 

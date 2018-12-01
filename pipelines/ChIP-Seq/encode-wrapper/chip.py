@@ -235,7 +235,7 @@ def main(args):
 		make_tests()
 	
 	
-	
+	logerrn("__finished__")	
 	
 	
 if __name__ == '__main__':
