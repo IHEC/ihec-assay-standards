@@ -6,7 +6,19 @@ from utilsm import *
 
 
 def main(args):
-	log = by_keyvalue(linesf(args[0]), k = lambda x: x.split()[0], v = lambda y: y.split()[1])
+	def k(x):
+		try:
+			return  x.split()[0]
+		except:
+			return '-'
+	def v(x):
+		try:
+			return x.split()[1]
+		except:
+			return '-'
+
+
+	log = by_keyvalue(linesf(args[0]), k, v)
 	expected = jloadf(args[1]) 
 	n_fails = 0
 	for k in expected:

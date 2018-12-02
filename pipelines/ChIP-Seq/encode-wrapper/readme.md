@@ -52,6 +52,43 @@ IHEC tests can be run with:
 The provided configuration files are for 75bp PET only. Standard configration files for SET and read lengths will be provided. Currently the only local mode is supported for singularity. Slurm support is on the way. The ENCODE documentation addresses both. 
 
 
+To compute md5s of generated file, use `trackoutput.py <output_dir_1> ...`. This will locate peak calls and bam files, and generate scripts `computemd5s_$i` to compute the md5s. Note the bam md5s are generated without teh bam header as that may contain full paths names. 
+
+
+As an example, supose output of `./singularity_wrapper.sh ./v2/ihec/cemt0007_h3k4me3.json` is in `$PWD/h3k4me3_out`. So do 
+
+    python trackoutput.py $PWD/h3k4me3_out
+	chmod +x ./computemd5s_0
+	./computemd5s_0 > log_h3k4me3
+	python status_cemt.py log_h3k4me3 expected_md5s_h3k4me3.json 
+
+This will match md5s for cemt0007 H3K4me3 analysis. And similarly for H3K27me3. 
+
+    $ python status_cemt.py computemd5s_0.out ./expected_md5s_h3k27me3.json 
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr2_x_ctl_for_rep1.pval0.01.500K.narrowPeak.gz 1c9554fe8b67e61fd7c69a1881ec2e3a
+    ok conservative_peak.narrowPeak.hammock.gz b78724bb667cc7bbfece8a587c10c915
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr1_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.hammock.gz defd886ab7923b952e04ee033a722fac
+    ok optimal_peak.narrowPeak.hammock.gz b78724bb667cc7bbfece8a587c10c915
+    ok rep1-pr.overlap.bfilt.narrowPeak.hammock.gz b78724bb667cc7bbfece8a587c10c915
+    ok rep1-pr.overlap.narrowPeak.gz a896c1ec4693ddbd2e098ffa901c1f2a
+    ok optimal_peak.narrowPeak.gz 49fdef6c06796ab06e8ac2a1b88075d1
+    ok rep1-pr.overlap.bfilt.narrowPeak.gz 49fdef6c06796ab06e8ac2a1b88075d1
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr1_x_ctl_for_rep1.pval0.01.500K.narrowPeak.gz b1ae4fb3f2b68b3c8346c57fa04f476f
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.gz 55de2037c6657d1027fb6b625822fa8b
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr1_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.gz 018ad8f5f3158534320ed359563878d3
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.hammock.gz bf5cd1f743325a0161d4ab77b00af829
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup_x_ctl_for_rep1.pval0.01.500K.narrowPeak.gz 7a52f55148b47e2a48fac330e3672c96
+    ok conservative_peak.narrowPeak.gz 49fdef6c06796ab06e8ac2a1b88075d1
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr2_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.gz 0f38658b68706ec12b5faded1141750e
+    ok ChIP-Seq.IX1239-A26688-GGCTAC.134224.D2B0LACXX.2.1.merged.nodup.pr2_x_ctl_for_rep1.pval0.01.500K.bfilt.narrowPeak.hammock.gz b1ac6ab70d053b546f186080639252ed
+    {
+        "failures": 0
+    }
+
+
+
+
+
 # To do
 
 These items are pending for calling this done - 
