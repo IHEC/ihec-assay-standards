@@ -8,8 +8,7 @@ This wrapper uses http://quay.io/encode-dcc/chip-seq-pipeline:v1.1.2
 
 ## IHEC Standard workflows
 
-[IHEC Standard workflows documentation](ihec_standard_workflow.md)
-
+Documemtation on how to define configs for IHEC standard workflows: [IHEC standard workflow](ihec_standard_workflow.md)
 
 ## Downloading test data
 
