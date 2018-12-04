@@ -78,7 +78,7 @@ To run ENCODE test tasks, do `singularity_encode_test_tasks.sh Local try1`. The 
         "#ok": 14
     }
 
-Doing `python chip.py  -maketests` will write ChIP test configurations:
+Doing `python chip.py  -maketests` will write ChIP test configurations (you also need to pass `-pwd2ext0` if you set `$PWD` to `/ext/mnt_0`) :
 
 * ./v2/ihec/cemt0007_h3k4me3.json
 
