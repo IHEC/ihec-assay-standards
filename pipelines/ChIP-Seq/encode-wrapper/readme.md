@@ -8,18 +8,18 @@ This wrapper uses http://quay.io/encode-dcc/chip-seq-pipeline:v1.1.2
 
 ## IHEC Standard workflows
 
-[a relative link](ihec_standard_workflow.md)
+[IHEC Standard workflows documentation](ihec_standard_workflow.md)
 
 
 ## Downloading test data
 
 First run `./get_encode_resources.sh` to get encode test dataset and hg38 genome files. 
 
+By default it will use git over http. If you want to use ssh, then pass `ssh` as first argument
+
 Run `chip.py -get` to get IHEC ChIP test data for MCF10A cell line.
 
-## Running tests
-
-By default it will use git over http. If you want to use ssh, then pass `ssh` as first argument
+## Pulling Singularity image and generating wrapper scripts
 
 Then run `python chip.py -pullimage -bindpwd` . Bind pwd will mount the current directory (equivalent to arguments `-B $PWD`). 
 
@@ -53,9 +53,11 @@ You can pass `-nobuild` if you hust want to regenerate the wrapper scripts witho
 
 Check singularity version with `singularity --version` to make sure it's at least `2.5.2` .
 
+## Running tests
+
 To run ENCODE test tasks, do `singularity_encode_test_tasks.sh Local try1`. The first argument is the confi argument to cromwell (see ENCODE pipeline documentation). Only Local is currently supported. The second is suffix for test output directory. The output of tests will be written in `test_tasks_results_try1` . Make sure all test pass, by looking through jsons generated. `./status_encode_tasks.py` can be used here. 
 
-    python ./status_encode_tasks.py ./*try2
+    python ./status_encode_tasks.py ./test_tasks_results_try1
     # ok:./test_tasks_results_try1/test_spr.test_task_output.json
     # ok:./test_tasks_results_try1/test_pool_ta.test_task_output.json
     # ok:./test_tasks_results_try1/test_reproducibility.test_task_output.json
