@@ -13,7 +13,7 @@ All code for IHEC standard pipelines available [here](/pipelines).
 
 ChIP-Seq documentation: [here](/pipelines/ChIP-Seq/encode-wrapper/readme.md)
 
-Bisulfite-Seq documentation: [here](/pipelines/Bisulfite-Seq @ 15f1e79)
+Bisulfite-Seq documentation: [here](/pipelines/Bisulfite-Seq)
 
 
 
