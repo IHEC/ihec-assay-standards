@@ -11,6 +11,10 @@ The documentation and code to compute metrics for all core assays are located [h
 
 All code for IHEC standard pipelines available [here](/pipelines).
 
+ChIP-Seq documentation: [here](/pipelines/ChIP-Seq/encode-wrapper/readme.md)
+
+Bisulfite-Seq documentation: [here](/pipelines/Bisulfite-Seq @ 15f1e79)
+
 
 
 
