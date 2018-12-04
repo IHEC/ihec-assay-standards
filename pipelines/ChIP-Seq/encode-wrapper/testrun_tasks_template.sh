@@ -10,10 +10,10 @@ echo "paths: $R_LIBS_USER $PYTHONPATH"
 echo $PATH
 
 
-CROMWELL_HOME="{home}"
+CROMWELL_HOME="{home_mnt}"
 BACKEND_CONF="{backend}"
 WORKFLOW_OPT="{container}"
-BACKEND="{backend_default}"
+BACKEND="$4"
 
 WDL="$1"
 

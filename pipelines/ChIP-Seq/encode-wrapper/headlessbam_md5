@@ -1,0 +1,6 @@
+#!/bin/bash
+
+
+
+m="$(samtools view $1 |  md5sum)"
+echo $m

@@ -23,10 +23,11 @@ def wget(url, debug=debug_mode):
 		logerr(' ..debug: wget {0}\n'.format(url))
 		dumpf(os.path.basename(url), 'test:{0}'.format(url))
 		return
-	p = subprocess.Popen('wget ' + url ,shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+	#p = subprocess.Popen('wget ' + url ,shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
 	#p = subprocess.Popen(['wget', url, '--directory-prefix', './test_data'] ,shell=False, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	for line in p.stdout.readlines():
-		logerr(line)
+	#for line in p.stdout.readlines():
+	#	logerr(line)
+	p = subprocess.Popen('wget ' + url ,shell=True)
 	return p.wait()
 	
 	
@@ -108,14 +109,14 @@ def get_test_data(configfile, home):
 
 
 
-def make_tests():
+def make_tests(args):
 	mcf10a = ['cemt0007_h3k4me3_template.json', 'cemt0007_h3k27me3_template.json'] 
 	
 	if os.path.isfile('./hg38_resources/base_config.json'):
 		config = jloadf('./hg38_resources/base_config.json')
 		base = config['base']
 	else:
-		base = os.path.abspath(os.getcwd())
+		base = '/mnt/ext_0' if '-pwd2ext0' in args else  os.path.abspath(os.getcwd())
 
 	def fix(fname, base):
 		assert fname.endswith('_template.json')
@@ -127,21 +128,19 @@ def make_tests():
 		print 'written:', fix(f, base)
 
 def write_testrun(config):
-	
 	with open('testrun_template.sh') as infile:
-		logerr(dumpf('{0}/piperunner.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
+		logerr('#written:' + dumpf('{0}/piperunner.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	with open('testrun_tasks_template.sh') as infile:
-		logerr(dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
+		logerr('#written:' +  dumpf('{0}/testrun_tasks.sh'.format(config['home']),  infile.read().format(**config)) + '\n')
 	
-	logerrn(dumpf('./singularity_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity {-B} exec {container_image} {home}/encode_test_tasks_run.sh $1\n\n'.format(**config)))
-	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\nsingularity {-B} exec {container_image} {home}/piperunner.sh $1 $2\n\n'.format(**config))
+	logerrn('#written:' + dumpf('./singularity_encode_test_tasks.sh', '#!/bin/bash\n\necho "home:$PWD"\n\nwhich singularity\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/encode_test_tasks_run.sh {home_mnt} "${{1:-Local}}" ${{@:2}}\n\n'.format(**config)))
+	return dumpf('./singularity_wrapper.sh', '#!/bin/bash\n\necho "home:$PWD"\nwhich singularity\n\nBACKEND="{backend_default}"\n\nsingularity exec {additional_binds} {container_image} {home_mnt}/piperunner.sh {home_mnt} $1 $BACKEND\n\n'.format(**config))
 
 
 
-def singularity_pull_image(home, config, debug=debug_mode):
-	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v2'
-	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1'
-	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1.1a'
+def singularity_pull_image(home, config, binds, debug=debug_mode):
+	imageurl = 'docker://quay.io/encode-dcc/chip-seq-pipeline:v1.1.2'
+	image_version = imageurl.split(':')[-1].replace('.', '_')
 	os.chdir('./images')
 	if debug:
 		dumpf('./debug.img', 'test:{0}'.format('singularity'))
@@ -151,31 +150,62 @@ def singularity_pull_image(home, config, debug=debug_mode):
 		if not '-nobuild' in config:
 			shell(cmd, assert_ok = True)
 	
-	images = glob.glob('./*img')
-	assert len(images) == 1
-	image_label = 'chip_seq_pipeline_v_1_1'
-	image_name = '{0}.simg'.format(image_label)
+	images = glob.glob('./*img') + glob.glob('./*.sif')
+	assert len(images) == 1, images
+	image_label = 'chip_seq_pipeline_{0}'.format(image_version)
+	image_ext = images[0].split('.')[-1]
+	image_name = '{0}.{1}'.format(image_label, image_ext)
 	logerr('# pulled image: {0}, moved: {1}\n'.format(images[0], image_name))
 	os.rename(images[0], image_name)
 	image_path = os.path.abspath(image_name)
 	os.chdir(home)
+	home_mnt = "/mnt/ext_0" if '-pwd2ext0' in config else home
+	container_mnt = '{0}/v2/singularity_container.json'.format(home_mnt)
 	container = jdumpf('./v2/singularity_container.json',  {
 		"default_runtime_attributes" : {
-			"singularity_container" : image_path,
+			"singularity_container" : '{0}/images/{1}'.format(home_mnt, image_name) ,
 			"singularity_instance_name": image_label
 		}
 	})
 		
-	shell('singularity exec {0} cp /software/chip-seq-pipeline/chip.wdl ./v2'.format(image_path), assert_ok=True)
+	shell('singularity exec {1} {0} cp /software/chip-seq-pipeline/chip.wdl {2}/v2/'.format(image_path, binds, home_mnt), assert_ok=True)
+	shell('singularity exec {1} {0} cp /software/chip-seq-pipeline/chip.wdl {2}/'.format(image_path, binds, home_mnt), assert_ok=True)
+	if not os.path.exists('./chip.wdl') or not os.path.exists('./v2/chip.wdl'):
+		raise Exception('__couldNotCopy__:chip.wdl likey current directory is not bound in the container... ' + binds)
 	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./v2/chip.wdl\n')
+	logerr('# copied /software/chip-seq-pipeline/chip.wdl to ./chip.wdl\n')
 	return {
+		'additional_binds' : binds,
 		"container_image":image_path,
 		"home" : home,
-		"backend_default" : '${2:-"Local"}',
-		"container" :  os.path.abspath(container),
-		"wdl" : "{0}/v2/chip.wdl".format(home),
-		"backend" : "{0}/backend.conf".format(home)
+		"home_mnt": home_mnt,
+		"bind_opt": "${3:-}",
+		"backend_default" : "${2:-Local}",
+		"container" : container_mnt,   #os.path.abspath(container),
+		"wdl" : "{0}/v2/chip.wdl".format(home_mnt),
+		"backend" : "{0}/backend.conf".format(home_mnt)
 	}
+
+
+def bindargs(args):
+	binds = ''
+	if not '-bindpwd' in args:
+		return binds
+	if '-bindpwd' in args:
+		params = [e for e in args if not e[0] == '-']
+		if '-pwd2ext0'in args:
+			bindpwd = '-B {0}:/mnt/ext_0'.format(os.getcwd())
+			offset = 1
+		else:
+			bindpwd = '-B ' + os.getcwd()
+			offset = 0
+
+		if not params:
+			return bindpwd
+		else:
+			return bindpwd + ',' + ','.join([ '{1}:/mnt/ext_{0}'.format(i + offset, e) for i,e in enumerate(params)])
+	return binds
+
 def main(args):
 	home = base()
 	logerr('# prefix {0}\n'.format(home))
@@ -199,20 +229,17 @@ def main(args):
 		get_test_data('./test_config.json', home)
 	
 	if '-pullimage' in args:
-		params = [e for e in args if not e[0] == '-']
-		container_config = singularity_pull_image(home, args, debug = False)
-		container_config['-B'] = ''
-		bind =  ','.join([ '{1}:/mnt/ext_{0}'.format(i, e) for i,e in enumerate(params)])
-		if len(params) > 0:
-			container_config['-B'] = '-B {0}'.format(bind)
+		params = [os.getcwd()] + [e for e in args if not e[0] == '-']
+		binds = bindargs(args)
+		container_config = singularity_pull_image(home, args, binds, debug = False)
 		container = write_testrun(container_config)
 		logerr('# container: {0}\n'.format(container))
 	
 	if '-maketests' in args:
-		make_tests()
+		make_tests(args)
 	
 	
-	
+	logerrn("__finished__")	
 	
 	
 if __name__ == '__main__':

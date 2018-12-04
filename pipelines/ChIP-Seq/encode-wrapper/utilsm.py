@@ -44,10 +44,9 @@ def logerrn(m):
 
 
 def shell(cmd, assert_ok=False):
-	p = subprocess.Popen(cmd, shell=True, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
-	for line in p.stdout: #.readlines():
-		logerr(line)
+	p = subprocess.Popen(cmd, shell=True)
 	exit = p.wait()
+	logerrn('#exit:{1} {0}'.format(cmd,exit))
 	if assert_ok:
 		assert exit == 0
 	return exit == 0
@@ -60,3 +59,20 @@ def mkdirs(path):
 	
 def movefile(s, d):
 	shutil.move(s, d)
+
+
+
+
+def by_keyvalue(alist, k, v):
+	hashed = dict()
+	for e in alist:
+		ke = k(e)
+		ve = v(e)
+		if not ke in hashed:
+			hashed[ke] = list()
+		hashed[ke].append(ve)
+	return hashed
+
+
+
+
