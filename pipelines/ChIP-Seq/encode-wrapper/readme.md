@@ -4,7 +4,7 @@
 
 Available at https://github.com/ENCODE-DCC/chip-seq-pipeline2/
 
-This wrapper uses http://quay.io/encode-dcc/chip-seq-pipeline:v1.1.2
+This wrapper uses http://quay.io/encode-dcc/chip-seq-pipeline:v1.1.4
 
 ## IHEC Standard workflows
 
