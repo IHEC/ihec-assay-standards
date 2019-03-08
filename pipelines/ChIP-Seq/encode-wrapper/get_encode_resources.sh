@@ -39,6 +39,11 @@ else
   git clone https://github.com/ENCODE-DCC/chip-seq-pipeline-test-data.git
 fi
 
+cd ./chip-seq-pipeline2
+git checkout tags/v1.1.4
+cd -
+
+
 
 #git clone https://github.com/ENCODE-DCC/chip-seq-pipeline2
 #git clone ssh://git@github.com/ENCODE-DCC/chip-seq-pipeline2.git
