@@ -3,7 +3,7 @@ ihec-assay-standards
 
 This repository is for code and documentation associated with the IHEC Assay Standards working group.
 
-#### QC Metrics (/qc_metrics)
+#### QC Metrics (/qc_metrics)[qc_metrics/]
 
 The documentation and code to compute metrics for all core assays are accessible at:
 
