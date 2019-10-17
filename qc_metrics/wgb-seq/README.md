@@ -28,3 +28,7 @@ How to run commands to obtain the metric
 - Prerequisites
 - Command explanation
 - Command example
+
+## Computing the metrics
+
+For scripts and resources helpful for computing the metrics see: [scripts](script/) and [GRCh38 resources](lib/)
