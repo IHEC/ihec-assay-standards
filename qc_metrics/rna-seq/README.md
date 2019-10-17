@@ -31,4 +31,4 @@ How to run commands to obtain the metric
 
 ## Computing the metrics
 
-For scripts and resources helpful for computing the metrics see: [scripts](script/)
+For scripts and resources helpful for computing the metrics see: [scripts](script/) and [GRCh38 resources](lib/GRCh38)
