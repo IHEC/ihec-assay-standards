@@ -12,6 +12,14 @@ The documentation and code to compute metrics for all core assays are located [h
 
 Documentation on the ongoing effort to create uniform pipelines across all data producing centres is available [here](/pipelines).
 
-#### Pipeline Code
+#### IHEC Pipelines
 
-All pipeline code is available under [ihec-pipelines-dev branch of this repository](https://github.com/IHEC/ihec-assay-standards/tree/ihec-pipelines-dev) while under development.  
+The computational pipeline adopted by IHEC are available via following IHEC repositories:
+
+
+* [Bisulfite-Seq](https://github.com/IHEC/gemBS)
+* [ChIP-Seq](https://github.com/IHEC/integrative_analysis_chip) 
+* [RNA-Seq](https://github.com/IHEC/grape-nf)
+
+Please see the individual pipelines' documentation for releases, workflows and directions on using the pipelines.
+
