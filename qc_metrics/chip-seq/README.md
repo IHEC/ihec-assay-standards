@@ -31,5 +31,5 @@ How to run commands to obtain the metric
 
 ## Computing the metrics
 
-For scripts and resources helpful for computing the metrics see: [scripts](qc_metrics/chip-seq/scripts)
+For scripts and resources helpful for computing the metrics see: [scripts](scripts/)
 
