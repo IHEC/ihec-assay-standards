@@ -5,7 +5,12 @@ This repository is for code and documentation associated with the IHEC Assay Sta
 
 #### QC Metrics (/qc_metrics)
 
-The documentation and code to compute metrics for all core assays are located [here](/qc_metrics).
+The documentation and code to compute metrics for all core assays are accessible at:
+
+* [Bisulfite-Seq QC metrics](qc_metrics/wgb-seq/)
+* [ChIP-Seq QC metrics](qc_metrics/chip-seq/)
+* [RNA-Seq QC metrics](qc_metrics/rna-seq/)
+
 
 
 #### IHEC Pipelines
