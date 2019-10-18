@@ -24,3 +24,9 @@ The computational pipeline adopted by IHEC are available via following IHEC repo
 
 Please see the individual pipelines' documentation for releases, workflows and directions on using the pipelines.
 
+#### Resources
+
+See [resources](resources.md)
+
+
+
