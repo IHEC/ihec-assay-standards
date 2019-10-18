@@ -33,4 +33,4 @@ To be discussed
 
 ## ENCODE ChIP-Seq resources
 
-ENCODE ChIP-Seq resources tarball
+[ENCODE ChIP-Seq resources tarball](https://storage.googleapis.com/encode-pipeline-genome-data/test_genome_database_hg38_chip.tar)
