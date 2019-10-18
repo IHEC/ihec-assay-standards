@@ -100,8 +100,9 @@ else
   echo "samtools flagstat .txt exists: ${cname}_markDup_flagstat.txt"
 fi
 
-total_reads=`grep "in total" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* in total .*//'`
-mapped_reads=`grep "mapped (" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* mapped (.*)//'`
+supplementarysecondary_reads=`bc <<< $(grep "secondary" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* secondary.*//')+$(grep "supplementary" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* supplementary.*//')`
+total_reads=`bc <<< $(grep "in total" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* in total .*//')-$supplementarysecondary_reads`
+mapped_reads=`bc <<< $(grep "mapped (" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* mapped (.*)//')-$supplementarysecondary_reads`
 dupped_reads=`grep "duplicates" $WORKING_DIR/${cname}/${cname}_markDup_flagstat.txt | sed -e 's/ + [[:digit:]]* duplicates$//'`
 dup_rate=$(echo "${dupped_reads}/${mapped_reads}" | bc -l)
 
