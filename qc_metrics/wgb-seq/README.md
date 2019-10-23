@@ -1,33 +1,6 @@
-# Metrics definition for WGB-Seq
+# Metrics definition for WGBS-Seq
 
-## 1- First metric
-
-### Definition
-Explanation of the metric, with external links if available.
-
-### Interpretation
-Acceptable thresholds when applicable.
-
-### Instructions
-How to run commands to obtain the metric
-- Prerequisites
-- Command explanation
-- Command example
-
-
-## 2- Second metric
-
-### Definition
-Explanation of the metric, with external links if available.
-
-### Interpretation
-Acceptable thresholds when applicable.
-
-### Instructions
-How to run commands to obtain the metric
-- Prerequisites
-- Command explanation
-- Command example
+## The WGBS-Seq QC metrics are in 'metrics.pdf' file
 
 ## Computing the metrics
 
