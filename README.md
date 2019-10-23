@@ -7,7 +7,7 @@ This repository is for code and documentation associated with the IHEC Assay Sta
 
 The documentation and code to compute metrics for all core assays are accessible at:
 
-* [Bisulfite-Seq QC metrics](qc_metrics/wgb-seq/)
+* [Bisulfite-Seq QC metrics](qc_metrics/wgbs-seq/)
 * [ChIP-Seq QC metrics](qc_metrics/chip-seq/)
 * [RNA-Seq QC metrics](qc_metrics/rna-seq/)
 
