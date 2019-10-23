@@ -1,6 +1,6 @@
 # Metrics definition for WGBS-Seq
 
-## The WGBS-Seq QC metrics are in 'metrics.pdf' file
+For WGBS-Seq QC metrics see [metrics.pdf file](metrics.pdf)
 
 ## Computing the metrics
 
