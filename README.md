@@ -26,7 +26,7 @@ Please see the individual pipelines' documentation for releases, workflows and d
 
 #### Resources
 
-See [resources](resources.md)
+For documentation on references and gene annotation used by IHEC pipelines, see: [resources](resources.md)
 
 
 
