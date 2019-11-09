@@ -1,35 +1,9 @@
 # Metrics definition for ChIP-Seq
 
-## 1- First metric
-
-### Definition
-Explanation of the metric, with external links if available.
-
-### Interpretation
-Acceptable thresholds when applicable.
-
-### Instructions
-How to run commands to obtain the metric
-- Prerequisites
-- Command explanation
-- Command example
-
-
-## 2- Second metric
-
-### Definition
-Explanation of the metric, with external links if available.
-
-### Interpretation
-Acceptable thresholds when applicable.
-
-### Instructions
-How to run commands to obtain the metric
-- Prerequisites
-- Command explanation
-- Command example
+[metrics](metrics.pdf)
 
 ## Computing the metrics
 
 For scripts and resources helpful for computing the metrics see: [scripts](script/)
 
+## Please note these scripts are deprecated in favor of [Integrative Analysis ChIP-Seq pipeline results](https://github.com/IHEC/ihec-assay-standards)
