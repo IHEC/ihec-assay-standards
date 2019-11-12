@@ -6,4 +6,4 @@
 
 For scripts and resources helpful for computing the metrics see: [scripts](script/)
 
-### Please note these scripts are deprecated in favor of [Integrative Analysis ChIP-Seq pipeline results](https://github.com/IHEC/ihec-assay-standards)
+#### Please note these scripts are deprecated in favor of [Integrative Analysis ChIP-Seq pipeline results](https://github.com/IHEC/integrative_analysis_chip)
