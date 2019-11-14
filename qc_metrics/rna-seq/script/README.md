@@ -1,26 +1,23 @@
-This folder contains a .PDF document with the definitions and shell script for computation of the RNA-seq QC metrics.
+# RNA-seq QC metrics
+
+This folder contains a document with the definitions and shell script for computation of the RNA-seq QC metrics.
 
 To calculate the metrics please use:
 
-- samtools v 1.3.1
-
-- picard v 2.9.0
-
-
+- sambamba v0.6.6
 
 ## Prerequisites:
-For the script to run you have to define the following environment variables:
+For the script to run you have to define the following environment variable:
 
+     export SAMBAMBA=<path-to-sambamba-binary>
 
-     export PICARD_290=<path-to-picard-tools-2.9.0>
+Temporary files are stored in `/tmp` by default. This setting can be overriden by:
 
-     export SAMTOOLS_131=<path-to-samtools-1.3.1>
-
-     export $TMP_DIR=<path-to-tmp-dir>
+     export $TMPDIR=<path-to-tmp-dir>
 
 Required computational resources:
 
-- 1 CPU Core 
+- at least 1 CPU Core 
 - 4 GB RAM
 
 ## How to use:
@@ -29,13 +26,15 @@ To run the statistics on your BAM file mapped to the human genome (assembly GRCh
 
 	[sullrich@cluster]$ ./rna_stats.sh
 
-	   USAGE: ./rna_stats.sh <SAMPLE_PATH> <INTERGENIC_BED> <RRNA_BED>
-	   The script computes RNA-seq quality metrics according to IHEC standards
+		USAGE: rna_stats.sh <SAMPLE_PATH> <INTERGENIC_BED> <RRNA_BED> [<THREADS>]
+   		The script computes RNA-seq qualtity metrics according to IHEC standards
 
-	   Input files in the following order are required:
-	   1. path to BAM file to be analyzed
-	   2. Bed file with intergenic coordinates
-	   3. Bed file with rRNA coordinates
+   		Input files in the following order are required:
+   		1. path to BAM file to be analyzed
+   		2. Bed file with intergenic coordinates
+   		3. Bed file with rRNA coordinates
+
+   		An optional 4th argument can be used to specify the maximum number of threads to use (default: 1)
 
 
 The script will create a folder in the chosen working directory with the name of the bam file. A statistics output file will be written inside in text format. This allows running many samples in parallel in your computational environment. Temporary files (e.g. duplicate marked BAM files) are removed to minimize disk usage.
@@ -43,7 +42,7 @@ The script will create a folder in the chosen working directory with the name of
 
 ## Example:
 
-./rna_stats.sh SAMPLE_ID.bam intergeneic_regions_gencode22_GRCh38.bed rRNA_Mt-rRNA_gencode22_GRCh38.bed
+./rna_stats.sh SAMPLE_ID.bam intergeneic_regions_gencode22_GRCh38.bed rRNA_Mt-rRNA_gencode22_GRCh38.bed 4
 
 The metrics are found in the text file SAMPLE_ID_read_stats.txt created in the directory SAMPLE_ID and have the following format:
 
